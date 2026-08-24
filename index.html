@@ -1629,7 +1629,18 @@
                     el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
                 }
 
-                window.addEventListener('resize', resize);
+                // debounced: mobile url-bar show/hide fires resize events that
+                // would rebuild the brain mid-scroll and make it visibly jump
+                let lastW = -1, lastH = -1, resizeTimer = null;
+                window.addEventListener('resize', () => {
+                    const nw = window.innerWidth, nh = window.innerHeight;
+                    if (nw === lastW && Math.abs(nh - lastH) < 150) return;
+                    clearTimeout(resizeTimer);
+                    resizeTimer = setTimeout(() => {
+                        lastW = window.innerWidth; lastH = window.innerHeight;
+                        resize();
+                    }, 160);
+                });
                 window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; mouse.active = true; });
                 window.addEventListener('mouseleave', () => { mouse.active = false; });
                 window.addEventListener('touchmove', () => { touchScrolling = true; }, { passive: true });
@@ -1642,18 +1653,17 @@
                 });
 
                 window.addEventListener('click', (e) => {
-                    if (W < 760) return;
                     if (e.target.closest('a, button, .nav-pill, .top-nav, .kmap-preview, .study-nav-row, .study-grid-wrap')) return;
                     goToField(fieldAt(e.clientX, e.clientY));
                 });
                 window.addEventListener('touchend', (e) => {
-                    if (W < 760) return;
                     if (e.target.closest('a, button, .nav-pill, .top-nav, .kmap-preview, .study-nav-row, .study-grid-wrap')) return;
                     const touch = e.changedTouches && e.changedTouches[0];
                     if (!touch || !touchStart) return;
                     // taps only
                     const moved = Math.hypot(touch.clientX - touchStart.x, touch.clientY - touchStart.y);
                     if (moved > 12) return;
+                    e.preventDefault();
                     goToField(fieldAt(touch.clientX, touch.clientY));
                 });
 
