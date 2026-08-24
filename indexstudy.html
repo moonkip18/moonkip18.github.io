@@ -1,0 +1,1758 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Moonkip - Study Log</title>
+    <meta name="description" content="Moonkip · Daily study log. Hours, streaks, and notes." />
+    <meta name="theme-color" content="#050506" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23050506'/%3E%3Ccircle cx='29' cy='27' r='11' fill='%23dfe3e8'/%3E%3Ccircle cx='45' cy='45' r='6' fill='%23c8433c'/%3E%3Cpath d='M33 33 L41 41' stroke='%23dfe3e8' stroke-opacity='.55' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <meta property="og:title" content="Moonkip - Study Log" />
+    <meta property="og:description" content="Moonkip · Daily study log. Hours, streaks, and notes." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content="og-cover.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #050506;
+            --bg-elevated: #0a0b0d;
+            --panel: rgba(6, 7, 9, 0.48);
+            --ink: #e9eaec;
+            --ink-dim: #8b8f97;
+            --ink-faint: #565a61;
+            --line: rgba(255, 255, 255, 0.08);
+            --synapse: #dfe3e8;
+            --synapse-dim: rgba(223, 227, 232, 0.3);
+            --red: #c8433c;
+            --red-dim: rgba(200, 67, 59, 0.4);
+            --cell-size: 26px;
+            --cell-gap: 4px;
+        }
+        html { background: var(--bg); scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: #242933 var(--bg); }
+        body { background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; font-weight: 300; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+        ::selection { background: var(--synapse-dim); color: #fff; }
+        a { color: inherit; text-decoration: none; }
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #171a20; border-radius: 8px; border: 2px solid var(--bg); }
+        ::-webkit-scrollbar-thumb:hover { background: #242933; }
+
+        #brain-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; display: block; pointer-events: auto; }
+        .vignette { position: fixed; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(ellipse at 70% 42%, rgba(5,5,6,0) 0%, rgba(5,5,6,0.2) 60%, rgba(5,5,6,0.55) 100%); }
+        .grain { position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0.03; mix-blend-mode: overlay; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+        #bg-particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .bg-neuron { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(159,214,255,0.2) 0%, rgba(159,214,255,0) 80%); will-change: transform, opacity; pointer-events: none; }
+        .bg-neuron-core { position: absolute; border-radius: 50%; background: rgba(159,214,255,0.5); top: 50%; left: 50%; transform: translate(-50%, -50%); will-change: transform; }
+        .comet { position: absolute; width: 2px; height: 2px; background: rgba(159,214,255,0.75); border-radius: 50%; box-shadow: 0 0 6px 2px rgba(159,214,255,0.25); will-change: transform, opacity; pointer-events: none; }
+        .comet::after { content: ''; position: absolute; top: 50%; right: 100%; width: 46px; height: 1px; background: linear-gradient(to left, rgba(159,214,255,0.45), transparent); transform: translateY(-50%); }
+
+        .top-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 5px 16px; background: rgba(5,5,6,0.3); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border-bottom: 1px solid var(--line); opacity: 0; animation: fadeUp 0.8s ease forwards 0.15s; }
+        .top-nav-mark { font-family: 'Fraunces', serif; font-style: italic; font-size: 12px; color: var(--ink-dim); white-space: nowrap; letter-spacing: 0.02em; }
+        .top-nav-links { display: flex; flex-wrap: wrap; gap: 2px; justify-content: flex-end; }
+        .nav-pill { font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 9px; border: 1px solid transparent; border-radius: 100px; color: var(--ink-faint); transition: all 0.3s ease; }
+        .nav-pill:hover { color: var(--ink); border-color: var(--synapse-dim); background: rgba(255,255,255,0.03); }
+        .nav-pill.active { color: var(--red); border-color: var(--red-dim); background: rgba(200,67,59,0.08); }
+        @media (max-width: 600px) {
+            .top-nav { padding: 4px 10px; }
+            .top-nav-mark { font-size: 10px; }
+            .nav-pill { font-size: 7px; padding: 3px 6px; }
+        }
+
+        .hero { position: relative; z-index: 3; min-height: 100vh; display: flex; align-items: flex-start; padding: 110px 30px 120px; pointer-events: none; }
+        .hero > * { pointer-events: auto; }
+        .hero-content { max-width: 560px; padding-right: 20px; margin-right: auto; flex-shrink: 0; }
+        .hero-mark { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.28em; color: var(--ink-faint); text-transform: uppercase; margin-bottom: 12px; opacity: 0; animation: fadeUp 1.2s ease forwards 0.2s; }
+        .hero-title { font-family: 'Fraunces', serif; font-weight: 400; font-size: clamp(36px, 7.5vw, 88px); letter-spacing: -0.01em; line-height: 1; color: var(--ink); opacity: 0; animation: fadeUp 1.3s ease forwards 0.4s; }
+        .hero-tagline { font-family: 'Fraunces', serif; font-style: italic; font-weight: 400; font-size: clamp(13px, 1.5vw, 18px); color: var(--ink-dim); margin-top: 14px; opacity: 0; animation: fadeUp 1.3s ease forwards 0.65s; }
+        .hero-subtitle { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: var(--ink-faint); text-transform: uppercase; margin-top: 14px; opacity: 0; animation: fadeUp 1.3s ease forwards 0.85s; }
+        .hero-subtitle span { color: var(--red); }
+        .hero-hint { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin-top: 14px; opacity: 0; animation: fadeUp 1.3s ease forwards 1.1s, hintFade 4s ease-in-out infinite 2.5s; }
+        @keyframes hintFade { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.85; } }
+        .hero-countdown { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.22em; color: var(--ink-faint); text-transform: uppercase; margin-top: 16px; opacity: 0; animation: fadeUp 1.3s ease forwards 1s; }
+        .hero-countdown b { font-weight: 500; color: var(--red); }
+        .scroll-cue { position: absolute; bottom: 28px; left: 0; right: 0; margin: 0 auto; width: fit-content; display: flex; flex-direction: column; align-items: center; gap: 4px; opacity: 0; animation: fadeUp 1.3s ease forwards 1.4s, bob 2.6s ease-in-out infinite 2.7s; }
+        .scroll-cue span { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.2em; color: var(--ink-faint); text-transform: uppercase; }
+        .scroll-cue .line { width: 1px; height: 20px; background: linear-gradient(to bottom, var(--ink-faint), transparent); }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+        .hero-spacer { flex: 1; min-width: 20px; }
+
+        main { position: relative; z-index: 3; }
+        .lab-section { scroll-margin-top: 48px; position: relative; background: var(--panel); backdrop-filter: blur(7px) saturate(1.1); -webkit-backdrop-filter: blur(7px) saturate(1.1); border-top: 1px solid var(--line); padding: 72px 24px; opacity: 0; transform: translateY(24px); transition: opacity 0.9s ease, transform 0.9s ease; }
+        .lab-section.visible { opacity: 1; transform: translateY(0); }
+        .lab-inner { max-width: 1080px; margin: 0 auto; }
+        .lab-eyebrow { display: flex; align-items: center; gap: 14px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: var(--red); text-transform: uppercase; margin-bottom: 18px; }
+        .lab-eyebrow::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
+        .brain-tag { margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); border: 1px solid var(--red-dim); background: rgba(200,67,59,0.06); border-radius: 100px; padding: 3px 10px; white-space: nowrap; }
+        .lab-heading { font-family: 'Fraunces', serif; font-weight: 400; font-size: clamp(22px, 4vw, 46px); letter-spacing: -0.01em; max-width: 640px; }
+        .lab-desc { font-size: 15px; line-height: 1.75; color: var(--ink-dim); max-width: 540px; margin-top: 18px; font-weight: 300; }
+        .lab-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); margin-top: 48px; border: 1px solid var(--line); }
+        .lab-card { background: var(--bg-elevated); padding: 26px 22px; min-height: 150px; display: flex; flex-direction: column; justify-content: space-between; transition: background 0.4s ease; }
+        .lab-card:hover { background: #0d0f13; }
+        .lab-card-id { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; color: var(--ink-faint); }
+        .lab-card-note { font-size: 13px; color: var(--ink-faint); line-height: 1.6; margin-top: 12px; font-style: italic; font-family: 'Fraunces', serif; }
+        .lab-card-status { display: inline-block; margin-top: 14px; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; color: var(--ink-faint); border: 1px solid var(--line); border-radius: 100px; padding: 3px 10px; width: fit-content; text-transform: uppercase; }
+        .lab-card-status.unstable { color: var(--red); border-color: var(--red-dim); }
+        .lab-section.visible .lab-card { animation: cardIn 0.7s ease backwards; }
+        .lab-section.visible .lab-card:nth-child(2) { animation-delay: 0.12s; }
+        .lab-section.visible .lab-card:nth-child(3) { animation-delay: 0.24s; }
+        @keyframes cardIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+        .kmap-preview { margin-top: 48px; border: 1px solid var(--line); background: var(--bg-elevated); padding: 32px; display: flex; flex-direction: column; gap: 22px; align-items: stretch; }
+        .kmap-preview svg { width: 100%; max-width: 680px; height: auto; margin: 0 auto; display: block; touch-action: none; user-select: none; -webkit-user-select: none; }
+        .kmap-node-label { font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; letter-spacing: 0.06em; fill: var(--ink-dim); text-transform: uppercase; }
+        .kmap-edge { transition: stroke 0.35s ease, stroke-opacity 0.35s ease; }
+        .kmap-edge.lit { stroke: rgba(159,214,255,0.85); stroke-opacity: 1; }
+        .kmap-node { cursor: grab; }
+        .kmap-node .dot { transition: r 0.15s ease, stroke 0.25s ease, stroke-width 0.25s ease; }
+        .kmap-node:hover .dot, .kmap-node.active .dot { r: 7; }
+        .kmap-node.active .dot { stroke: var(--red-dim); stroke-width: 2; }
+        .kmap-node.active text { fill: var(--red); }
+        .kmap-info-links { font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; letter-spacing: 0.08em; color: var(--ink-faint); text-transform: uppercase; margin-top: 4px; line-height: 1.6; }
+        .kmap-reset { align-self: flex-start; background: transparent; border: 1px solid var(--line); border-radius: 100px; color: var(--ink-faint); font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; padding: 6px 14px; cursor: pointer; transition: color 0.3s ease, border-color 0.3s ease; }
+        .kmap-reset:hover { color: var(--ink); border-color: var(--synapse-dim); }
+        .kmap-info { border-left: 2px solid var(--synapse-dim); padding-left: 16px; display: flex; flex-direction: column; gap: 4px; }
+        .kmap-info-title { font-family: 'Fraunces', serif; font-size: 16px; color: var(--ink); }
+        .kmap-info-desc { font-size: 13px; color: var(--ink-dim); line-height: 1.6; max-width: 560px; }
+
+        .grind-hero { margin: 44px 0 36px; padding: 34px 30px; background: var(--bg-elevated); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; align-items: flex-start; position: relative; overflow: hidden; }
+        .grind-hero::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(to right, var(--red-dim), transparent); }
+        .grind-num { font-family: 'Fraunces', serif; font-size: clamp(44px, 12vw, 96px); line-height: 0.95; letter-spacing: -0.02em; color: var(--ink); }
+        .grind-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-faint); }
+
+        .study-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-bottom: 20px; }
+        .stat-chip { background: var(--bg-elevated); padding: 14px 16px; }
+        .stat-num { display: block; font-family: 'Fraunces', serif; font-size: 24px; line-height: 1.1; color: var(--ink); }
+        .stat-num.hot { color: var(--red); }
+        .stat-label { display: block; margin-top: 3px; font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); }
+
+        .split-wrap { display: none; align-items: center; gap: 10px; margin-top: 12px; font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); }
+        .split-bar { display: flex; width: 150px; height: 7px; border-radius: 3px; overflow: hidden; background: #101318; }
+        .split-bar { display: block; width: 150px; height: 7px; border-radius: 3px; background: #182028; }
+        .split-val { color: var(--ink-dim); text-transform: none; letter-spacing: 0.05em; }
+
+        .weekly-wrap { margin-top: 20px; border: 1px solid var(--line); background: var(--bg-elevated); padding: 18px 20px 24px; }
+        .weekly-head { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 14px; }
+        .weekly-head b { font-weight: 500; color: var(--synapse); }
+        .weekly-head.hot b { color: #ec7676; }
+        .weekly-head .w-pace { color: var(--ink-faint); }
+        .weekly-track { position: relative; height: 14px; border-radius: 999px; background: #0d0f13; border: 1px solid var(--line); }
+        .weekly-fill { position: relative; overflow: hidden; height: 100%; width: 0%; border-radius: 999px; background: rgba(159,214,255,0.45); transition: width 0.8s ease; }
+        .weekly-fill.hot { background: rgba(200,67,59,0.55); }
+        .weekly-tick { position: absolute; top: -5px; bottom: -5px; width: 2px; transform: translateX(-1px); background: var(--red); }
+        .weekly-tick::after { content: ''; position: absolute; top: -4px; left: -2px; width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
+
+        .study-log { margin-top: 48px; padding-top: 40px; border-top: 1px solid var(--line); }
+        .study-log-head { display: flex; flex-direction: column; gap: 4px; margin-bottom: 18px; }
+        .study-log-title { font-family: 'Fraunces', serif; font-size: 20px; color: var(--ink); }
+        .study-log-sub { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.05em; color: var(--ink-faint); }
+        .study-nav-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+        .study-nav-left { display: flex; align-items: center; gap: 10px; }
+        .study-nav-btn { background: transparent; border: 1px solid var(--line); color: var(--ink-dim); font-family: 'IBM Plex Mono', monospace; font-size: 13px; line-height: 1; width: 26px; height: 26px; border-radius: 6px; cursor: pointer; transition: color 0.2s ease, border-color 0.2s ease; }
+        .study-nav-btn:hover { color: var(--ink); border-color: var(--synapse-dim); }
+        .study-month-label { font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.08em; color: var(--ink); min-width: 130px; text-align: center; }
+        .study-totals { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: var(--ink-dim); text-align: right; text-transform: uppercase; }
+        .study-totals .tot-num { color: var(--synapse); font-size: 13px; }
+        .study-totals .tot-split { color: var(--ink-faint); }
+        .study-grid-wrap { overflow-x: auto; padding-bottom: 6px; }
+        .study-grid { display: grid; grid-template-columns: repeat(7, var(--cell-size)); gap: var(--cell-gap); width: fit-content; margin: 0 auto; }
+        .study-cell { width: var(--cell-size); height: var(--cell-size); border-radius: 4px; border: 1px solid var(--line); background: transparent; cursor: default; transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease; position: relative; display: flex; align-items: center; justify-content: center; font-size: 8px; color: var(--ink-faint); font-family: 'IBM Plex Mono', monospace; }
+        .study-cell:hover { transform: scale(1.2); z-index: 5; border-color: rgba(159,214,255,0.5); box-shadow: 0 0 20px rgba(159,214,255,0.08); }
+        .study-cell .day-num { position: absolute; bottom: 2px; right: 4px; font-size: 7px; opacity: 0.3; pointer-events: none; }
+        .study-cell[data-lvl="2"] { background: rgba(159,214,255,0.20); border-color: transparent; }
+        .study-cell[data-lvl="3"] { background: rgba(159,214,255,0.36); border-color: transparent; }
+        .study-cell[data-lvl="4"] { background: rgba(159,214,255,0.62); border-color: transparent; }
+        .study-cell[data-lvl="0"]:hover { border-color: rgba(255,255,255,0.12); }
+        .study-cell.today { border-color: var(--red) !important; }
+        .study-cell .tooltip { display: none; position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%); background: var(--bg-elevated); border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; white-space: nowrap; font-family: 'Inter', sans-serif; font-size: 12px; color: var(--ink); box-shadow: 0 8px 30px rgba(0,0,0,0.7); pointer-events: none; z-index: 10; font-weight: 400; }
+        .study-cell:hover .tooltip, .study-cell .tooltip.open { display: block; }
+        .tooltip { box-shadow: 0 4px 14px rgba(0,0,0,0.45); }
+        .tooltip .math-hrs { color: var(--synapse); }
+        .tooltip .code-hrs { color: var(--red); }
+        .study-legend { display: flex; align-items: flex-start; justify-content: center; gap: 12px; margin-top: 16px; }
+        .study-legend .lg-item { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .study-legend .lg-item span { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); }
+        .study-legend i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; border: 1px solid var(--line); }
+        .study-legend i.lvl2 { background: rgba(159,214,255,0.32); border-color: transparent; }
+        .study-legend i.lvl3 { background: rgba(159,214,255,0.55); border-color: transparent; }
+        .study-legend i.lvl4 { background: #c9ced6; border-color: transparent; }
+
+        .skill-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 28px; }
+        .skill-tab { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); background: transparent; border: 1px solid var(--line); border-radius: 100px; padding: 6px 14px; cursor: pointer; transition: color 0.25s ease, border-color 0.25s ease, background 0.25s ease; }
+        .skill-tab:hover { color: var(--ink); border-color: var(--synapse-dim); }
+        .skill-tab.active { color: var(--red); border-color: var(--red-dim); background: rgba(200,67,59,0.08); }
+        .skills-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; }
+        .skill-chip { background: var(--bg-elevated); border: 1px solid var(--line); padding: 16px; width: 236px; min-height: 104px; display: flex; flex-direction: column; gap: 4px; transition: background 0.3s ease, border-color 0.3s ease; }
+        .skill-chip:hover { background: #0d0f13; }
+        .skill-chip.fam-chip { background: #07080a; }
+        .skill-chip.fam-chip:hover { background: #0a0c10; }
+        .skill-chip .s-cat { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--synapse); opacity: 0.75; }
+        .skill-chip .s-name { font-family: 'Fraunces', serif; font-size: 15px; color: var(--ink); }
+        .skill-chip .s-name.fam { color: var(--ink-dim); font-size: 14px; }
+        .skill-chip .s-fam { font-family: 'IBM Plex Mono', monospace; font-size: 7.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); border: 1px solid var(--line); border-radius: 100px; padding: 2px 7px; width: fit-content; }
+        .skill-chip .s-note { font-size: 12px; color: var(--ink-faint); line-height: 1.55; }
+        .skills-empty { width: 100%; background: var(--bg-elevated); padding: 26px; text-align: center; color: var(--ink-faint); font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; }
+
+        .notes-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 40px; }
+        .note-card { background: var(--bg-elevated); border: 1px solid var(--line); padding: 22px; width: 340px; transition: background 0.3s ease; }
+        .note-card:hover { background: #0d0f13; }
+        .note-card .n-date { font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); }
+        .note-card .n-title { display: block; margin-top: 8px; font-family: 'Fraunces', serif; font-size: 18px; color: var(--ink); }
+        .note-card .n-body { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; margin-top: 8px; font-size: 13px; line-height: 1.65; color: var(--ink-dim); }
+
+        .talk-grid { display: flex; gap: 10px; margin-top: 40px; }
+        .talk-card { background: var(--bg-elevated); border: 1px solid var(--line); padding: 16px 14px; flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; transition: background 0.3s ease, border-color 0.3s ease; }
+        .talk-card.grow { flex: 1.8; }
+        .talk-card .t-handle { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        @media (max-width: 980px) {
+            .talk-grid { flex-wrap: wrap; }
+            .talk-card { flex: 1 1 42%; }
+            .talk-card.grow { flex: 1 1 100%; }
+        }
+        .talk-card:hover { background: #0d0f13;  }
+        .talk-card.soon { opacity: 0.55; }
+        #discordCard { cursor: pointer; }
+        .talk-card .t-platform { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
+        .talk-card .t-handle { font-family: 'Fraunces', serif; font-size: 14px; color: var(--ink); }
+
+        footer { position: relative; z-index: 3; background: var(--bg); border-top: 1px solid var(--line); padding: 40px 24px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+        footer .fmark { font-family: 'Fraunces', serif; font-style: italic; font-size: 14px; color: var(--ink-dim); }
+        footer .fnote { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: var(--ink-faint); text-transform: uppercase; }
+        footer .fcontact { margin-top: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-dim); border: 1px solid var(--line); border-radius: 100px; padding: 8px 18px; transition: color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; }
+        footer .fcontact:hover { color: var(--red); border-color: var(--red-dim); }
+        footer .ftime { font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; letter-spacing: 0.14em; color: var(--ink-faint); text-transform: uppercase; opacity: 0.7; }
+
+        @media (max-width: 900px) {
+            .hero { padding: 92px 20px 48px; }
+            .hero-content { max-width: 82%; padding-right: 0; text-align: left; }
+            .hero-spacer { display: none; }
+        }
+        @media (max-width: 760px) {
+            .lab-grid { grid-template-columns: 1fr; }
+            .lab-section { padding: 48px 18px; }
+            :root { --cell-size: 28px; --cell-gap: 5px; }
+            .study-month-label { font-size: 15px; }
+            .study-totals { font-size: 11px; }
+            .study-legend .lg-item span { font-size: 9px; }
+            .study-cell .tooltip { font-size: 10px; padding: 5px 10px; bottom: calc(100% + 6px); }
+            .skill-chip { width: calc(50% - 6px); padding: 12px; }
+            .skill-chip .s-name { font-size: 13px; }
+            .skill-chip .s-cat { font-size: 7.5px; }
+            .skill-chip .s-fam { font-size: 7px; }
+            .stat-num { font-size: 20px; }
+            .note-card { width: 100%; }
+            .talk-card .t-handle { font-size: 13px; }
+        }
+        @media (max-width: 480px) {
+            :root { --cell-size: 26px; --cell-gap: 4px; }
+            .kmap-preview { padding: 14px; overflow-x: auto; }
+            .kmap-preview svg { min-width: 640px; }
+            .kmap-node-label { font-size: 11px; }
+            .kmap-node .dot { r: 6; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .hero-mark, .hero-title, .hero-tagline, .hero-subtitle, .hero-countdown, .top-nav, .scroll-cue {
+                animation: none !important; opacity: 1 !important; transform: none !important;
+            }
+            .lab-section { transition: none; }
+            .study-cell:hover { transform: none; }
+            .lab-card, .skill-chip, .bg-neuron, .comet { animation: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="brain-canvas" aria-hidden="true"></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+    <div id="bg-particles" aria-hidden="true"></div>
+
+    <nav class="top-nav">
+        <a class="top-nav-mark" href="#">Moonkip</a>
+        <div class="top-nav-links">
+            <a class="nav-pill" href="#about">About</a>
+            <a class="nav-pill" href="#progress">Progress</a>
+            <a class="nav-pill" href="#notes">Notes</a>
+            <a class="nav-pill" href="#tools">Tools</a>
+            <a class="nav-pill" href="#what-i-know">What I Know</a>
+            <a class="nav-pill" href="#knowledge-map">Knowledge Map</a>
+            <a class="nav-pill" href="#talk">Talk</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-mark">Gap year, putting my all</div>
+            <h1 class="hero-title">Moonkip</h1>
+            <p class="hero-tagline">Studying, and doing whatever feels interesting to me along the way.</p>
+            <p class="hero-subtitle">Mathematics <span>×</span> Artificial intelligence<span>×</span> Neuroscience <span>×</span> Computer engineering</p>
+            <p class="hero-countdown" id="heroCountdown"></p>
+            <p class="hero-hint">click a node on the brain → jump to that section</p>
+            <div class="scroll-cue">
+                <span>Scroll</span>
+                <div class="line"></div>
+            </div>
+        </div>
+        <div class="hero-spacer"></div>
+    </section>
+
+    <main>
+
+        <!-- About -->
+        <section class="lab-section" id="about">
+            <div class="lab-inner">
+                <div class="lab-eyebrow">Log · 01 - About Me</div>
+                <h2 class="lab-heading">Moonkip, in brief</h2>
+                <p class="lab-desc">18, Studying for CEE and doing AI, Math, Neuroscience on the side. Obsessed with Intelligence.<p>
+                <div class="lab-grid">
+                    <div class="lab-card">
+                        <div><div class="lab-card-id">FCT · 001</div><div class="lab-card-note">Studying Mathematics. Goal: Computer engineering.</div></div>
+                        <div class="lab-card-status">Goal</div>
+                    </div>
+                    <div class="lab-card">
+                        <div><div class="lab-card-id">FCT · 002</div><div class="lab-card-note">Aiming for 10+ hours a day, 100 a week.</div></div>
+                        <div class="lab-card-status">Target</div>
+                    </div>
+                    <div class="lab-card">
+                        <div><div class="lab-card-id">FCT · 003</div><div class="lab-card-note">Everythings just for fun. what's the point if you don't enjoy it?</div></div>
+                        <div class="lab-card-status">Honestly</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Progress -->
+        <section class="lab-section" id="progress">
+            <div class="lab-inner">
+                <div class="lab-eyebrow">Log . 02 - Progress <span class="brain-tag">Basal Ganglia</span></div>
+                <h2 class="lab-heading">Study log</h2>
+                <p class="lab-desc">The hours, logged daily</p>
+                <div class="grind-hero">
+                    <span class="grind-num" id="grindHours">-</span>
+                    <span class="grind-label">hours tracked by hand since day one</span>
+                </div>
+                <div class="study-log">
+                    <div class="study-log-head">
+                        <span class="study-log-title">Study Hours</span>
+                        <span class="study-log-sub">hover a day for details - arrows change month</span>
+                    </div>
+
+                    <div class="study-stats" id="studyStats"></div>
+
+                    <div class="weekly-wrap">
+                        <div class="weekly-head" id="weeklyHead"></div>
+                        <div class="weekly-track">
+                            <div class="weekly-fill" id="weeklyFill"></div>
+                            <div class="weekly-tick" id="weeklyTick" title="minimum pace - be past this line by tonight"></div>
+                        </div>
+                    </div>
+
+                    <div class="study-nav-row">
+                        <div class="study-nav-left">
+                            <button class="study-nav-btn" id="prevMonthBtn" aria-label="Previous month">‹</button>
+                            <span class="study-month-label" id="studyMonthLabel"></span>
+                            <button class="study-nav-btn" id="nextMonthBtn" aria-label="Next month">›</button>
+                        </div>
+                        <div class="study-totals" id="studyTotals"></div>
+                    </div>
+
+                    <div class="study-grid-wrap">
+                        <div id="studyGrid" class="study-grid"></div>
+                    </div>
+
+                    <div class="study-legend">
+                        <div class="lg-item"><i></i><span>0h</span></div>
+                        <div class="lg-item"><i class="lvl2"></i><span>4h</span></div>
+                        <div class="lg-item"><i class="lvl3"></i><span>8h</span></div>
+                        <div class="lg-item"><i class="lvl4"></i><span>12h+</span></div>
+                    </div>
+
+                    <div class="split-wrap" id="splitWrap">
+                        <span>math</span>
+                        <span class="split-bar" id="splitBar"></span>
+                        <span>code</span>
+                        <span class="split-val" id="splitVal"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Field Notes -->
+        <section class="lab-section" id="notes">
+            <div class="lab-inner">
+                <div class="lab-eyebrow">Log · 03 - Field Notes</div>
+                <h2 class="lab-heading">Notes</h2>
+                <p class="lab-desc">Everything worth remembering, personal notes.</p>
+                <div class="notes-grid" id="notesGrid"></div>
+            </div>
+        </section>
+
+        <!-- My Tools -->
+        <section class="lab-section" id="tools">
+            <div class="lab-inner">
+                <div class="lab-eyebrow">Log · 04 - My Tools</div>
+                <h2 class="lab-heading">Stuff I built to make this easier</h2>
+                <p class="lab-desc">Trackers, timers, planners, small things that make studying less annoying.</p>
+                <div class="lab-grid">
+                    <div class="lab-card">
+                        <div><div class="lab-card-id">TOL · 001</div><div class="lab-card-note">A proper study tracker with detailed tracking.</div></div>
+                        <div class="lab-card-status">On GitHub soon</div>
+                    </div>
+                    <div class="lab-card">
+                        <div><div class="lab-card-id">TOL · 002</div><div class="lab-card-note">A planner that splits longterm goals into daily tasks</div></div>
+                        <div class="lab-card-status">On GitHub soon</div>
+                    </div>
+                    <div class="lab-card">
+                        <div><div class="lab-card-id">TOL · 003</div><div class="lab-card-note">Sleep tmr, memory booster</div></div>
+                        <div class="lab-card-status">On GitHub soon</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- What I Know -->
+        <section class="lab-section" id="what-i-know">
+            <div class="lab-inner">
+                <div class="lab-eyebrow">Log · 05 - What I Know</div>
+                <h2 class="lab-heading">What I know</h2>
+                <p class="lab-desc">What I actually use, sorted very loosely by category.</p>
+                <div class="skill-tabs" id="skillTabs"></div>
+                <div class="skills-grid" id="skillsGrid"></div>
+            </div>
+        </section>
+
+        <!-- Knowledge Map -->
+        <section class="lab-section" id="knowledge-map">
+            <div class="lab-inner">
+                <div class="lab-eyebrow">Log · 06 - Knowledge Map <span class="brain-tag">Corpus Callosum</span></div>
+                <h2 class="lab-heading">How it all connects</h2>
+                <p class="lab-desc">rough map of how AI, math, neuroscience, and computer engineering connect, with computation underneath all of it.</p>
+                <div class="kmap-preview">
+                    <svg id="kmapSvg" viewBox="0 0 640 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g id="kmapEdges"></g>
+                        <g id="kmapNodes"></g>
+                    </svg>
+                    <div class="kmap-info">
+                        <span class="kmap-info-title" id="kmapInfoTitle">Computation</span>
+                        <span class="kmap-info-desc" id="kmapInfoDesc">Drag nodes around, hover to see connections, click for notes.</span>
+                        <span class="kmap-info-links" id="kmapInfoLinks"></span>
+                    </div>
+                    <button class="kmap-reset" id="kmapResetBtn" type="button">reset layout</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Talk -->
+        <section class="lab-section" id="talk">
+            <div class="lab-inner">
+                <div class="lab-eyebrow">Log · 07 - Talk</div>
+                <h2 class="lab-heading">Contact</h2>
+                <p class="lab-desc">I check some of these more than others, pick whatever’s more comfy for you.</p>
+                <div class="talk-grid">
+                    <div class="talk-card soon" title="Repo goes public later">
+                        <span class="t-platform">GitHub</span>
+                        <span class="t-handle">private for now</span>
+                    </div>
+                    <div class="talk-card" id="discordCard" title="Click to copy Discord handle">
+                        <span class="t-platform">Discord</span>
+                        <span class="t-handle">moonkip1174</span>
+                    </div>
+                    <a class="talk-card" href="https://t.me/deathispermanet1" target="_blank" rel="noopener">
+                        <span class="t-platform">Telegram</span>
+                        <span class="t-handle">@deathispermanet1</span>
+                    </a>
+                    <div class="talk-card soon" title="Coming soon">
+                        <span class="t-platform">TikTok</span>
+                        <span class="t-handle">not up yet</span>
+                    </div>
+                    <a class="talk-card grow" href="mailto:contact.moonkip@gmail.com">
+                        <span class="t-platform">Email</span>
+                        <span class="t-handle">contact.moonkip@gmail.com</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="fmark">Moonkip - Study Log</div>
+        <div class="fnote">Updated as the days pass</div>
+        <div class="ftime" id="footerClock"></div>
+    </footer>
+
+    <script>
+        // daily log
+        const STUDY_ENTRIES = [
+            // line below
+            // { date: '2026-08-23', math: 0, coding: 0 },
+            { date: '2026-08-24', math: 8, coding: 4 }
+        ];
+
+        // baseline (hours i've put in studying before making this website)
+        const BASELINE_HOURS = 2200;
+
+        const GOALS = {
+            label: 'Konkur 1406',
+            // estimated date, ill update when official
+            date: '2027-07-01',
+        };
+
+        const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+
+        // parse as local date never utc
+        function parseLocalDate(str) {
+            if (typeof str !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(str.trim())) return null;
+            const p = str.trim().split('-').map(Number);
+            const d = new Date(p[0], p[1] - 1, p[2]);
+            if (d.getFullYear() !== p[0] || d.getMonth() !== p[1] - 1 || d.getDate() !== p[2]) return null;
+            return d;
+        }
+
+        let viewDate = new Date();
+        viewDate.setDate(1);
+
+        function changeMonth(delta) {
+            viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + delta, 1);
+            renderStudyGrid();
+        }
+
+        function renderStudyGrid() {
+            const grid = document.getElementById('studyGrid');
+            const label = document.getElementById('studyMonthLabel');
+            const totals = document.getElementById('studyTotals');
+            if (!grid) return;
+
+            const year = viewDate.getFullYear();
+            const month = viewDate.getMonth();
+
+            const now = new Date();
+            const isCurrentMonth = (year === now.getFullYear() && month === now.getMonth());
+            const today = now.getDate();
+
+            label.textContent = MONTH_NAMES[month] + ' ' + year;
+
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            // grid
+            const firstDay = (new Date(year, month, 1).getDay() + 6) % 7;
+
+            const entryMap = {};
+            let mathTotal = 0;
+            let codingTotal = 0;
+            let monthEntries = 0;
+            STUDY_ENTRIES.forEach(e => {
+                const d = parseLocalDate(e.date);
+                if (!d) {
+                    console.warn('STUDY_ENTRIES: skipped entry with bad date "' + e.date + '"');
+                    return;
+                }
+                if (d.getFullYear() === year && d.getMonth() === month) {
+                    entryMap[d.getDate()] = e;
+                    mathTotal += e.math || 0;
+                    codingTotal += e.coding || 0;
+                    monthEntries++;
+                }
+            });
+            const totalHrs = mathTotal + codingTotal;
+            const fmt = n => (Number.isInteger(n) ? String(n) : n.toFixed(1));
+            if (monthEntries === 0) {
+                totals.innerHTML = '<span class="tot-split">no entries this month · add them in STUDY_ENTRIES</span>';
+            } else {
+                totals.innerHTML =
+                    '<span class="tot-num">' + fmt(totalHrs) + 'h</span> total <span class="tot-split">· ' +
+                    fmt(mathTotal) + 'h math · ' + fmt(codingTotal) + 'h code</span>';
+            }
+
+            grid.innerHTML = '';
+
+            const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            dayNames.forEach(dn => {
+                const header = document.createElement('div');
+                header.style.cssText =
+                    'font-size:8px;color:var(--ink-faint);text-align:center;font-family:IBM Plex Mono,monospace;letter-spacing:0.06em;padding-bottom:4px;';
+                header.textContent = dn;
+                grid.appendChild(header);
+            });
+
+            for (let i = 0; i < firstDay; i++) {
+                const empty = document.createElement('div');
+                empty.style.cssText = 'border:none;background:transparent;pointer-events:none;';
+                grid.appendChild(empty);
+            }
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const cell = document.createElement('div');
+                cell.className = 'study-cell';
+                const entry = entryMap[d];
+                const total = entry ? (entry.math || 0) + (entry.coding || 0) : 0;
+                let lvl = 0;
+                if (total >= 12) lvl = 4;
+                else if (total >= 8) lvl = 3;
+                else if (total > 0) lvl = 2;
+                cell.dataset.lvl = lvl;
+
+                if (isCurrentMonth && d === today) cell.classList.add('today');
+
+                const num = document.createElement('span');
+                num.className = 'day-num';
+                num.textContent = d;
+                cell.appendChild(num);
+
+                if (entry) {
+                    const tip = document.createElement('div');
+                    tip.className = 'tooltip';
+                    tip.innerHTML =
+                        '<span class="math-hrs">Math: ' + (entry.math || 0) + 'h</span> · <span class="code-hrs">Coding: ' + (entry.coding || 0) + 'h</span>';
+                    cell.appendChild(tip);
+                    cell.title = '';
+                    // tap toggles
+                    cell.addEventListener('click', () => {
+                        const wasOpen = tip.classList.contains('open');
+                        document.querySelectorAll('.tooltip.open').forEach(t => t.classList.remove('open'));
+                        if (!wasOpen) tip.classList.add('open');
+                    });
+                } else {
+                    cell.title = d + ' - no data';
+                }
+
+                grid.appendChild(cell);
+            }
+        }
+
+        (function initReveal() {
+            const sectionEls = document.querySelectorAll('.lab-section');
+            if (!('IntersectionObserver' in window)) {
+                sectionEls.forEach(s => s.classList.add('visible'));
+                return;
+            }
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.12 });
+            sectionEls.forEach(s => observer.observe(s));
+
+            // scroll
+            const navPills = document.querySelectorAll('.nav-pill');
+            const setActive = (id) => {
+                navPills.forEach(p => p.classList.toggle('active', p.getAttribute('href') === '#' + id));
+            };
+            const spy = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) setActive(entry.target.id);
+                });
+            }, { rootMargin: '-35% 0px -60% 0px' });
+            sectionEls.forEach(s => spy.observe(s));
+        })();
+
+        // what i know part
+        const SKILLS = [
+    { name: 'Python', cat: 'programming' },
+    { name: 'JavaScript', cat: 'programming' },
+    { name: 'TypeScript', cat: 'programming' },
+            { name: 'C / C++', cat: 'programming', fam: true },
+            { name: 'Data Structures & Algorithms', cat: 'programming', fam: true },
+            { name: 'Data analysis', cat: 'programming' },
+
+    { name: 'React', cat: 'dev' },
+    { name: 'Next.js', cat: 'dev' },
+    { name: 'FastAPI', cat: 'dev' },
+    { name: 'PostgreSQL', cat: 'dev' },
+    { name: 'REST APIs', cat: 'dev' },
+
+    { name: 'PyTorch', cat: 'ai' },
+    { name: 'Transformers', cat: 'ai' },
+    { name: 'Hugging Face', cat: 'ai' },
+    { name: 'LLM Applications', cat: 'ai' },
+    { name: 'RAG', cat: 'genai' },
+    { name: 'AI Agents', cat: 'genai' },
+    { name: 'MCP (Model Context Protocol)', cat: 'genai' },
+    { name: 'Prompt Engineering', cat: 'genai' },
+    { name: 'Reinforcement Learning', cat: 'ai', fam: true },
+    { name: 'Fine-tuning Language Models', cat: 'ai', fam: true },
+    { name: 'Vector Databases', cat: 'ai', fam: true },
+    { name: 'LangGraph', cat: 'ai', fam: true },
+];
+
+        function initSkills() {
+            const tabsEl = document.getElementById('skillTabs');
+            const gridEl = document.getElementById('skillsGrid');
+            if (!tabsEl || !gridEl) return;
+
+            const CATS = [
+                { id: 'programming', label: 'Programming' },
+                { id: 'dev', label: 'Software Dev' },
+                { id: 'ai', label: 'AI / ML' },
+                { id: 'genai', label: 'Generative AI' }
+            ];
+            const catLabel = c => (CATS.find(x => x.id === c) || {}).label || c;
+
+            let active = CATS[0].id;
+
+            function renderTabs() {
+                tabsEl.innerHTML = '';
+                CATS.forEach(c => {
+                    const b = document.createElement('button');
+                    b.type = 'button';
+                    b.className = 'skill-tab' + (active === c.id ? ' active' : '');
+                    b.setAttribute('aria-pressed', String(active === c.id));
+                    b.textContent = c.label;
+                    b.addEventListener('click', () => { active = c.id; renderTabs(); renderGrid(); });
+                    tabsEl.appendChild(b);
+                });
+            }
+
+            function renderGrid() {
+                gridEl.innerHTML = '';
+                const items = SKILLS.filter(s => s.cat === active);
+                if (!items.length) {
+                    const empty = document.createElement('div');
+                    empty.className = 'skills-empty';
+                    empty.textContent = 'Nothing filed under this tab yet.';
+                    gridEl.appendChild(empty);
+                    return;
+                }
+                items.forEach(s => {
+                    const card = document.createElement('div');
+                    card.className = 'skill-chip' + (s.fam ? ' fam-chip' : '');
+                    card.innerHTML =
+                        '<span class="s-cat"></span>' +
+                        '<span class="s-name"></span>';
+                    const nameEl = card.querySelector('.s-name');
+                    nameEl.textContent = s.name;
+                    if (s.fam) nameEl.classList.add('fam');
+                    if (s.fam || s.note) {
+                        const extra = document.createElement('span');
+                        extra.className = s.fam ? 's-fam' : 's-note';
+                        extra.textContent = s.fam ? 'familiar with' : s.note;
+                        card.appendChild(extra);
+                    }
+                    card.querySelector('.s-cat').textContent = catLabel(s.cat);
+                    gridEl.appendChild(card);
+                });
+            }
+
+            renderTabs();
+            renderGrid();
+        }
+
+        // notes
+        const NOTES = [
+            { title: 'Starting', date: '2026-08-28', body: 'First Note. \s The rest is up to you, space cowboy.' },
+        ];
+
+        function initNotes() {
+            const gridEl = document.getElementById('notesGrid');
+            if (!gridEl) return;
+            gridEl.innerHTML = '';
+            if (!NOTES.length) {
+                const empty = document.createElement('div');
+                empty.className = 'skills-empty';
+                empty.textContent = 'No notes yet - add one in NOTES above.';
+                gridEl.appendChild(empty);
+                return;
+            }
+            NOTES.forEach(n => {
+                const d = parseLocalDate(n.date);
+                const card = document.createElement('article');
+                card.className = 'note-card';
+                const dateEl = document.createElement('span');
+                dateEl.className = 'n-date';
+                dateEl.textContent = d
+                    ? MONTH_NAMES[d.getMonth()].slice(0, 3) + ' ' + d.getDate() + ', ' + d.getFullYear()
+                    : String(n.date || '');
+                const titleEl = document.createElement('span');
+                titleEl.className = 'n-title';
+                titleEl.textContent = n.title || 'Untitled';
+                const bodyEl = document.createElement('p');
+                bodyEl.className = 'n-body';
+                bodyEl.textContent = n.body || '';
+                card.appendChild(dateEl);
+                card.appendChild(titleEl);
+                card.appendChild(bodyEl);
+                gridEl.appendChild(card);
+            });
+        }
+
+        const RM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let lastTotal = null;
+        let grindAnimated = false;
+        let grindAnimating = false;
+
+        function renderCountdown() {
+            const el = document.getElementById('heroCountdown');
+            if (!el) return;
+            const target = GOALS && GOALS.date ? parseLocalDate(GOALS.date) : null;
+            if (!target) { el.style.display = 'none'; return; }
+            const now = new Date();
+            const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const days = Math.round((target.getTime() - todayStart.getTime()) / 86400000);
+            const label = (GOALS.label || 'goal').toUpperCase();
+            if (days > 0) {
+                el.innerHTML = '<b>D-' + days + '</b> · ' + label;
+            } else if (days === 0) {
+                el.innerHTML = '<b>TODAY</b> · ' + label;
+            } else {
+                el.style.display = 'none';
+            }
+        }
+
+        function animateGrind(finalVal) {
+            const el = document.getElementById('grindHours');
+            if (!el) return;
+            if (RM || finalVal <= 0) { el.textContent = finalVal + 'h'; return; }
+            const dur = 1500;
+            const t0 = performance.now();
+            grindAnimating = true;
+            const stepFn = (t) => {
+                const p = Math.min(1, (t - t0) / dur);
+                const eased = 1 - Math.pow(1 - p, 3);
+                el.textContent = Math.round(finalVal * eased) + 'h';
+                if (p < 1) requestAnimationFrame(stepFn);
+                else { el.textContent = finalVal + 'h'; grindAnimating = false; }
+            };
+            requestAnimationFrame(stepFn);
+        }
+
+        function renderStudyStats() {
+            const el = document.getElementById('studyStats');
+            if (!el) return;
+            const fmt = n => Number.isInteger(n) ? String(n) : n.toFixed(1);
+            const chip = (num, labelTxt, hot) =>
+                '<div class="stat-chip"><span class="stat-num' + (hot ? ' hot' : '') + '">' + num +
+                '</span><span class="stat-label">' + labelTxt + '</span></div>';
+
+            const days = [];
+            let total = BASELINE_HOURS;
+            let mSum = 0;
+            let cSum = 0;
+            STUDY_ENTRIES.forEach(e => {
+                const d = parseLocalDate(e.date);
+                if (!d) return;
+                const h = (e.math || 0) + (e.coding || 0);
+                days.push({ d, h: h });
+                total += h;
+                mSum += e.math || 0;
+                cSum += e.coding || 0;
+            });
+            lastTotal = total;
+
+            if (!days.length) {
+                el.innerHTML =
+                    chip(fmt(BASELINE_HOURS) + 'h', 'total hours') +
+                    chip('0', 'active days') +
+                    chip('-', 'current streak') +
+                    chip('-', 'best day');
+                const grindEl0 = document.getElementById('grindHours');
+                if (grindEl0 && !grindAnimating) grindEl0.textContent = fmt(BASELINE_HOURS) + 'h';
+                const sw0 = document.getElementById('splitWrap');
+                if (sw0) sw0.style.display = 'none';
+                return;
+            }
+
+            days.sort((a, b) => a.d - b.d);
+            const DAY = 86400000;
+            const norm = d => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+
+            //
+            let bestRun = 1, run = 1;
+            for (let i = 1; i < days.length; i++) {
+                const gap = (norm(days[i].d) - norm(days[i - 1].d)) / DAY;
+                run = gap === 1 ? run + 1 : 1;
+                if (run > bestRun) bestRun = run;
+            }
+            // streak
+            const lastGapDays = (norm(new Date()) - norm(days[days.length - 1].d)) / DAY;
+            let cur = 0;
+            if (lastGapDays <= 1) {
+                cur = 1;
+                for (let i = days.length - 1; i > 0; i--) {
+                    const gap = (norm(days[i].d) - norm(days[i - 1].d)) / DAY;
+                    if (gap === 1) cur++;
+                    else break;
+                }
+            }
+            const bestDay = days.reduce((m, x) => Math.max(m, x.h), 0);
+
+            el.innerHTML =
+                chip(fmt(total) + 'h', 'total hours') +
+                chip(String(days.length), 'active days') +
+                chip(cur > 0 ? cur + 'd' : '-', 'current streak', cur > 0) +
+                chip(fmt(bestDay) + 'h', 'best day');
+
+            const grindEl = document.getElementById('grindHours');
+            if (grindEl && !grindAnimating) grindEl.textContent = fmt(total) + 'h';
+
+            const sw = document.getElementById('splitWrap');
+            if (sw) {
+                const barEl = document.getElementById('splitBar');
+                const valEl = document.getElementById('splitVal');
+                const both = mSum + cSum;
+                if (both > 0) {
+                    sw.style.display = 'flex';
+                    const mp = mSum / both * 100;
+                    const mCol = 'rgba(159,214,255,0.95)';
+                    const cCol = 'rgba(244,247,250,0.95)';
+                    const a = Math.max(0, mp - 14);
+                    const b = Math.min(100, mp + 14);
+                    barEl.style.background =
+                        'linear-gradient(90deg, ' + mCol + ' 0%, ' + mCol + ' ' + a.toFixed(1) + '%, ' +
+                        cCol + ' ' + b.toFixed(1) + '%, ' + cCol + ' 100%)';
+                    valEl.textContent = fmt(mSum) + 'h / ' + fmt(cSum) + 'h';
+                } else {
+                    sw.style.display = 'none';
+                }
+            }
+        }
+
+        const WEEKLY_GOAL_H = 100;
+        //1 = monday, 6 = saturday
+        const WEEK_STARTS_ON = 1;
+
+        function renderWeekly() {
+            const fill = document.getElementById('weeklyFill');
+            const head = document.getElementById('weeklyHead');
+            const tick = document.getElementById('weeklyTick');
+            if (!fill || !head || !tick) return;
+
+            const now = new Date();
+            const dow = ((now.getDay() - WEEK_STARTS_ON) + 7) % 7;
+            const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dow);
+            const nextMonday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 7);
+
+            let hrs = 0;
+            STUDY_ENTRIES.forEach(e => {
+                const d = parseLocalDate(e.date);
+                if (!d) return;
+                if (d >= monday && d < nextMonday) hrs += (e.math || 0) + (e.coding || 0);
+            });
+
+            const fmt = n => Number.isInteger(n) ? String(n) : n.toFixed(1);
+            const pct = Math.min(100, (hrs / WEEKLY_GOAL_H) * 100);
+            const hot = hrs >= WEEKLY_GOAL_H;
+            const daysLeft = 7 - dow;
+            const leftH = Math.max(0, WEEKLY_GOAL_H - hrs);
+            const onPace = hrs >= WEEKLY_GOAL_H * ((dow + 1) / 7);
+
+            fill.style.width = pct.toFixed(1) + '%';
+            fill.classList.toggle('hot', hot);
+            tick.style.left = (((dow + 1) / 7) * 100).toFixed(2) + '%';
+
+            head.classList.toggle('hot', hot);
+            head.innerHTML =
+                '<span><b>' + fmt(hrs) + 'h</b> / ' + WEEKLY_GOAL_H + 'h this week</span>' +
+                '<span class="w-pace">' +
+                (hot ? '100h done' :
+                    (onPace ? 'on pace' : 'behind pace') +
+                    ' · ' + fmt(leftH) + 'h to go · ' +
+                    daysLeft + (daysLeft === 1 ? ' day' : ' days') + ' left') +
+                '</span>';
+        }
+
+        try {
+            (function knowledgeMap() {
+                const svg = document.getElementById('kmapSvg');
+                if (!svg) return;
+                const edgesG = document.getElementById('kmapEdges');
+                const nodesG = document.getElementById('kmapNodes');
+                const infoTitle = document.getElementById('kmapInfoTitle');
+                const infoDesc = document.getElementById('kmapInfoDesc');
+                const infoLinks = document.getElementById('kmapInfoLinks');
+                const resetBtn = document.getElementById('kmapResetBtn');
+
+                const nodes = [
+                    { id: 'cmp', label: 'Computation', x: 320, y: 200, core: true, desc: 'The common thread. Intelligence, life, and engineering all come down to computation afterall, just in different ways.' },
+                    { id: 'ai', label: 'Artificial Intelligence', x: 130, y: 110, core: false, desc: 'Building systems that learn, without fully agreeing on what learning even means.' },
+                    { id: 'math', label: 'Mathematics', x: 500, y: 100, core: false, desc: 'The language everything is written in: dynamical systems, probability, high dimensional geometry.' },
+                    { id: 'neuro', label: 'Neuroscience', x: 90, y: 270, core: false, desc: 'The only working example we have of general intelligence, messy yet so beautiful.' },
+                    { id: 'ce', label: 'Computer Engineering', x: 480, y: 290, core: false, desc: 'The machinery behind computation: processors, memory, architecture, and the systems connecting them.' },
+                ];
+                const edges = [
+                    ['cmp', 'ai'], ['cmp', 'math'], ['cmp', 'neuro'], ['cmp', 'ce'],
+                    ['ai', 'math'], ['neuro', 'ce'], ['ai', 'neuro'], ['math', 'ce']
+                ];
+
+                const nodeById = {};
+                nodes.forEach(n => {
+                    nodeById[n.id] = n;
+                    n.x0 = n.x; n.y0 = n.y;
+                    n.hx = n.x; n.hy = n.y;
+                    n.vx = 0; n.vy = 0;
+                    n.ph = Math.random() * Math.PI * 2;
+                    n.sp = 0.5 + Math.random() * 0.5;
+                });
+
+                let activeId = null;
+                let hoverId = null;
+                let dragId = null;
+
+                function neighborsOf(id) {
+                    const out = [];
+                    edges.forEach(([a, b]) => {
+                        if (a === id) out.push(b);
+                        else if (b === id) out.push(a);
+                    });
+                    return out;
+                }
+
+                function updateLights() {
+                    const focus = dragId || hoverId || activeId;
+                    edgeEls.forEach(({ a, b, line }) => {
+                        line.classList.toggle('lit', !!focus && (a === focus || b === focus));
+                    });
+                }
+
+                const edgeEls = edges.map(([a, b]) => {
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('class', 'kmap-edge');
+                    line.setAttribute('stroke', 'rgba(159,214,255,0.28)');
+                    line.setAttribute('stroke-width', '1');
+                    line.setAttribute('stroke-dasharray', (a === 'cmp' || b === 'cmp') ? 'none' : '2 4');
+                    edgesG.appendChild(line);
+                    return { a, b, line };
+                });
+
+                const nodeEls = {};
+                nodes.forEach(n => {
+                    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    g.setAttribute('class', 'kmap-node');
+                    const hit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    hit.setAttribute('r', 14);
+                    hit.setAttribute('fill', 'transparent');
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('class', 'dot');
+                    circle.setAttribute('r', n.core ? 5 : 4);
+                    circle.setAttribute('fill', n.core ? '#c8433c' : '#c9ced6');
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('class', 'kmap-node-label');
+                    text.setAttribute('text-anchor', 'middle');
+                    text.setAttribute('y', -12);
+                    text.textContent = n.label.toUpperCase();
+                    g.appendChild(hit);
+                    g.appendChild(circle);
+                    g.appendChild(text);
+                    nodesG.appendChild(g);
+                    nodeEls[n.id] = { g, circle, text };
+
+                    g.addEventListener('pointerenter', () => { hoverId = n.id; updateLights(); });
+                    g.addEventListener('pointerleave', () => { if (hoverId === n.id) hoverId = null; updateLights(); });
+                });
+
+                function render() {
+                    edgeEls.forEach(({ a, b, line }) => {
+                        const A = nodeById[a];
+                        const B = nodeById[b];
+                        line.setAttribute('x1', A.x);
+                        line.setAttribute('y1', A.y);
+                        line.setAttribute('x2', B.x);
+                        line.setAttribute('y2', B.y);
+                    });
+                    nodes.forEach(n => {
+                        nodeEls[n.id].g.setAttribute('transform', 'translate(' + n.x + ',' + n.y + ')');
+                    });
+                }
+
+                function svgPoint(clientX, clientY) {
+                    const pt = svg.createSVGPoint();
+                    pt.x = clientX;
+                    pt.y = clientY;
+                    const ctm = svg.getScreenCTM();
+                    if (!ctm) return { x: 0, y: 0 };
+                    return pt.matrixTransform(ctm.inverse());
+                }
+
+                function showInfo(id) {
+                    activeId = id;
+                    const n = nodeById[id];
+                    infoTitle.textContent = n.label;
+                    infoDesc.textContent = n.desc;
+                    infoLinks.textContent = 'linked · ' + neighborsOf(id).map(k => nodeById[k].label).join(' · ');
+                    Object.keys(nodeEls).forEach(k => nodeEls[k].g.classList.toggle('active', k === id));
+                    updateLights();
+                }
+
+                const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+                const reduceMotionKm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+                svg.addEventListener('pointerdown', (e) => {
+                    const el = e.target.closest('.kmap-node');
+                    if (!el) return;
+                    const id = Object.keys(nodeEls).find(k => nodeEls[k].g === el);
+                    if (!id) return;
+                    dragId = id;
+                    const p = svgPoint(e.clientX, e.clientY);
+                    nodeById[id].gx = p.x - nodeById[id].x;
+                    nodeById[id].gy = p.y - nodeById[id].y;
+                    try { svg.setPointerCapture(e.pointerId); } catch (err) {}
+                    el.style.cursor = 'grabbing';
+                    showInfo(id);
+                    updateLights();
+                    e.preventDefault();
+                });
+
+                svg.addEventListener('pointermove', (e) => {
+                    if (!dragId) return;
+                    const p = svgPoint(e.clientX, e.clientY);
+                    const n = nodeById[dragId];
+                    n.x = clamp(p.x - n.gx, 24, 616);
+                    n.y = clamp(p.y - n.gy, 26, 374);
+                    n.vx = 0;
+                    n.vy = 0;
+                    render();
+                    e.preventDefault();
+                });
+
+                svg.addEventListener('pointerup', () => {
+                    if (dragId) {
+                        const n = nodeById[dragId];
+                        n.hx = n.x;
+                        n.hy = n.y;
+                        nodeEls[dragId].g.style.cursor = 'grab';
+                        dragId = null;
+                        updateLights();
+                    }
+                });
+
+                svg.addEventListener('pointercancel', () => { dragId = null; updateLights(); });
+
+                if (resetBtn) resetBtn.addEventListener('click', () => {
+                    nodes.forEach(n => { n.hx = n.x0; n.hy = n.y0; });
+                });
+
+                // idle/animated drift
+                let simT = Math.random() * 100;
+                let lastTs = null;
+                let running = false;
+
+                function step(dt) {
+                    simT += dt;
+                    const k = dt / 0.0167;
+                    nodes.forEach(n => {
+                        if (n.id === dragId) return;
+                        const wx = n.hx + Math.sin(simT * n.sp + n.ph) * 4;
+                        const wy = n.hy + Math.cos(simT * n.sp * 0.83 + n.ph) * 4;
+                        n.vx += (wx - n.x) * 0.06 * k;
+                        n.vy += (wy - n.y) * 0.06 * k;
+                        n.vx *= Math.pow(0.82, k);
+                        n.vy *= Math.pow(0.82, k);
+                        n.x += n.vx * k;
+                        n.y += n.vy * k;
+                    });
+                }
+
+                function loop(ts) {
+                    if (!running) { lastTs = null; return; }
+                    if (lastTs === null) lastTs = ts;
+                    const dt = Math.min(0.05, (ts - lastTs) / 1000);
+                    lastTs = ts;
+                    step(dt);
+                    render();
+                    requestAnimationFrame(loop);
+                }
+
+                function startLoop() {
+                    if (running || reduceMotionKm) return;
+                    running = true;
+                    requestAnimationFrame(loop);
+                }
+
+                const section = document.getElementById('knowledge-map');
+                if ('IntersectionObserver' in window && section) {
+                    new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            running = entry.isIntersecting;
+                            if (running) startLoop();
+                        });
+                    }, { threshold: 0.05 }).observe(section);
+                } else {
+                    startLoop();
+                }
+
+                render();
+                showInfo('cmp');
+            })();
+        } catch (err) {
+            console.error('Knowledge map failed to initialize:', err);
+        }
+
+        try {
+            (function spawnBgParticles() {
+                const container = document.getElementById('bg-particles');
+                if (!container) return;
+
+                const neuronCount = window.innerWidth < 760 ? 35 : 65;
+                for (let i = 0; i < neuronCount; i++) {
+                    const size = 5 + Math.random() * 22;
+                    const el = document.createElement('div');
+                    el.className = 'bg-neuron';
+                    el.style.left = (Math.random() * 100) + '%';
+                    el.style.top = (Math.random() * 100) + '%';
+                    el.style.width = size + 'px';
+                    el.style.height = size + 'px';
+                    const dur = 16 + Math.random() * 28;
+                    const delay = -Math.random() * dur;
+                    el.style.animation = 'floatNeuron ' + dur + 's ease-in-out ' + delay + 's infinite alternate';
+                    el.style.opacity = 0.15 + Math.random() * 0.35;
+
+                    const core = document.createElement('div');
+                    core.className = 'bg-neuron-core';
+                    core.style.width = (size * 0.25 + 1.5) + 'px';
+                    core.style.height = (size * 0.25 + 1.5) + 'px';
+                    core.style.opacity = 0.4 + Math.random() * 0.5;
+                    el.appendChild(core);
+                    container.appendChild(el);
+                }
+
+                const cometCount = window.innerWidth < 760 ? 7 : 13;
+                for (let i = 0; i < cometCount; i++) {
+                    const el = document.createElement('div');
+                    el.className = 'comet';
+                    el.style.left = (Math.random() * 96 + 2) + '%';
+                    el.style.top = (Math.random() * 96 + 2) + '%';
+                    const dur = 6 + Math.random() * 8;
+                    const delay = -Math.random() * dur;
+                    const dist = 130 + Math.random() * 240;
+                    const angle = Math.random() * Math.PI * 2;
+                    el.style.setProperty('--angle', angle + 'rad');
+                    el.style.setProperty('--dist', dist + 'px');
+                    el.style.animation = 'cometSweep ' + dur + 's linear ' + delay + 's infinite';
+                    container.appendChild(el);
+                }
+
+                if (!document.getElementById('particle-keyframes')) {
+                    const style = document.createElement('style');
+                    style.id = 'particle-keyframes';
+                    style.textContent =
+                        '@keyframes floatNeuron {' +
+                        '0%   { transform: translate(0, 0) scale(1); }' +
+                        '33%  { transform: translate(18px, -20px) scale(1.12); }' +
+                        '66%  { transform: translate(-15px, 20px) scale(0.88); }' +
+                        '100% { transform: translate(12px, -12px) scale(1.06); }' +
+                        '}' +
+                        '@keyframes cometSweep {' +
+                        '0%     { transform: rotate(var(--angle, 0rad)) translateX(0); opacity: 0; }' +
+                        '7%     { opacity: 0.9; }' +
+                        '34%    { transform: rotate(var(--angle, 0rad)) translateX(var(--dist, 160px)); opacity: 0.5; }' +
+                        '42%    { transform: rotate(var(--angle, 0rad)) translateX(var(--dist, 160px)); opacity: 0; }' +
+                        '42.01% { transform: rotate(var(--angle, 0rad)) translateX(0); opacity: 0; }' +
+                        '100%   { transform: rotate(var(--angle, 0rad)) translateX(0); opacity: 0; }' +
+                        '}';
+                    document.head.appendChild(style);
+                }
+            })();
+        } catch (err) {
+            console.error('Background particles failed to initialize:', err);
+        }
+
+        try {
+            (function brainCanvas() {
+                const canvas = document.getElementById('brain-canvas');
+                const ctx = canvas.getContext('2d');
+                const reduceMotion = RM;
+
+                let W, H, DPR;
+                let particles = [];
+                let neighborLinks = [];
+                let mouse = { x: -9999, y: -9999, active: false };
+                let frame = 0;
+                let pulses = [];
+                let lastPulseSpawn = 0;
+                let roamers = [];
+                let brainInView = true;
+                let touchStart = null;
+
+                // dots (one per tab)
+                const FIELD_LABELS = [
+                    { key: 'PROGRESS', text: 'Progress', rx: 0.12, ry: 0.05, target: 'progress' },
+                    { key: 'TOOLS', text: 'Tools', rx: 0.18, ry: -0.33, target: 'tools' },
+                    { key: 'KMAP', text: 'Knowledge Map', rx: 0.09, ry: -0.17, target: 'knowledge-map' },
+                    { key: 'ABOUT', text: 'About', rx: -0.06, ry: -0.02, target: 'about' },
+                    { key: 'TALK', text: 'Talk', rx: -0.28, ry: -0.10, target: 'talk' },
+                    { key: 'KNOW', text: 'What I Know', rx: 0.30, ry: 0.13, target: 'what-i-know' },
+                    { key: 'NOTES', text: 'Notes', rx: -0.31, ry: 0.07, target: 'notes' },
+                ];
+
+                let hoveredField = null;
+                let clickPulse = null;
+
+                function resize() {
+                    DPR = Math.min(window.devicePixelRatio || 1, 2);
+                    W = window.innerWidth;
+                    H = window.innerHeight;
+                    canvas.width = W * DPR;
+                    canvas.height = H * DPR;
+                    canvas.style.width = W + 'px';
+                    canvas.style.height = H + 'px';
+                    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+                    buildBrain();
+                    buildRoamers();
+                    if (reduceMotion) requestAnimationFrame(draw);
+                }
+
+                function buildRoamers() {
+                    roamers = [];
+                    const count = W < 760 ? 28 : 52;
+                    for (let i = 0; i < count; i++) {
+                        roamers.push({
+                            cx: Math.random() * W,
+                            cy: Math.random() * H,
+                            ax: 30 + Math.random() * 90,
+                            ay: 20 + Math.random() * 70,
+                            fx: 0.10 + Math.random() * 0.24,
+                            fy: 0.08 + Math.random() * 0.22,
+                            phase: Math.random() * Math.PI * 2,
+                            seed: Math.random() * 1000,
+                            r: Math.random() * 0.8 + 0.3,
+                        });
+                    }
+                }
+
+                function insideBrain(x, y, cx, cy, scale) {
+                    const nx = (x - cx) / scale;
+                    const ny = (y - cy) / scale;
+
+                    const cb = (nx * nx) / 0.092 + ((ny - 0.315) * (ny - 0.315)) / 0.042;
+                    if (cb <= 1) return Math.sin(ny * 58) < 0.45;
+
+                    let hemi = false;
+                    for (let s = -1; s <= 1; s += 2) {
+                        const th = -s * 0.12;
+                        const ca = Math.cos(th), sa = Math.sin(th);
+                        const px = nx - s * 0.155, py = ny + 0.02;
+                        const u = px * ca + py * sa,
+                            v = -px * sa + py * ca;
+                        if ((u * u) / 0.087 + (v * v) / 0.221 <= 1) { hemi = true; break; }
+                    }
+
+                    const ax = Math.abs(nx) - 0.33;
+                    const tl = (ax * ax) / 0.016 + ((ny - 0.10) * (ny - 0.10)) / 0.052;
+                    if (!hemi && tl > 1) return false;
+
+                    if (Math.abs(nx) < 0.03 + 0.06 * Math.max(0, -ny - 0.25) && ny < 0.16) return false;
+
+                    const g1 = Math.sin(nx * 17 + Math.sin(ny * 3.1) * 1.6 + 0.8);
+                    const g2 = Math.sin((nx + ny) * 11 - Math.sin(nx * 2.3) * 1.2);
+                    if (Math.abs(g1) < 0.10 || Math.abs(g2) < 0.07) return false;
+
+                    return true;
+                }
+
+                function buildBrain() {
+                    particles = [];
+                    const cx = W < 760 ? W * 0.50 : W * 0.72;
+                    const cy = W < 760 ? H * 0.66 : H * 0.47;
+                    const scale = Math.min(W, H) * (W < 760 ? 0.55 : 0.64);
+
+                    const targetCount = W < 760 ? 440 : 950;
+                    let attempts = 0;
+                    const maxAttempts = targetCount * 40;
+
+                    while (particles.length < targetCount && attempts < maxAttempts) {
+                        attempts++;
+                        const rx = (Math.random() * 2 - 1) * 0.60;
+                        const ry = (Math.random() * 2 - 1) * 0.56;
+                        const x = cx + rx * scale;
+                        const y = cy + ry * scale;
+                        if (insideBrain(x, y, cx, cy, scale)) {
+                            particles.push({
+                                x, y,
+                                baseX: x,
+                                baseY: y,
+                                vx: (Math.random() - 0.5) * 0.06,
+                                vy: (Math.random() - 0.5) * 0.06,
+                                driftSeed: Math.random() * 1000,
+                                r: Math.random() * 1.2 + 0.65,
+                            });
+                        }
+                    }
+
+                    // wide
+                    const spreadX = W < 760 ? 1.18 : 1;
+                    FIELD_LABELS.forEach(f => {
+                        f.x = cx + f.rx * scale * spreadX;
+                        f.y = cy + f.ry * scale;
+                        f.dx = f.x;
+                        f.dy = f.y;
+                        f.ph = Math.random() * Math.PI * 2;
+                        f.sp = 0.5 + Math.random() * 0.5;
+                        f.amp = 2.5 + Math.random() * 2.5;
+                    });
+                    computeLinks();
+                }
+
+                function fieldAt(x, y) {
+                    const hitRadius = W < 760 ? 36 : 44;
+                    let closest = null, closestDist = hitRadius;
+                    FIELD_LABELS.forEach(f => {
+                        const dx = f.dx - x, dy = f.dy - y;
+                        const d = Math.sqrt(dx * dx + dy * dy);
+                        if (d < closestDist) { closestDist = d; closest = f; }
+                    });
+                    return closest;
+                }
+
+                function computeLinks() {
+                    neighborLinks = [];
+                    const maxDist = W < 760 ? 28 : 34;
+                    const maxDistSq = maxDist * maxDist;
+                    const cell = maxDist;
+                    const grid = new Map();
+                    const key = (gx, gy) => gx + ',' + gy;
+
+                    particles.forEach((p, i) => {
+                        const gx = Math.floor(p.x / cell), gy = Math.floor(p.y / cell);
+                        const k = key(gx, gy);
+                        if (!grid.has(k)) grid.set(k, []);
+                        grid.get(k).push(i);
+                    });
+
+                    particles.forEach((p, i) => {
+                        const gx = Math.floor(p.x / cell), gy = Math.floor(p.y / cell);
+                        for (let dx = -1; dx <= 1; dx++) {
+                            for (let dy = -1; dy <= 1; dy++) {
+                                const k = key(gx + dx, gy + dy);
+                                const bucket = grid.get(k);
+                                if (!bucket) continue;
+                                bucket.forEach(j => {
+                                    if (j <= i) return;
+                                    const q = particles[j];
+                                    const ddx = p.x - q.x, ddy = p.y - q.y;
+                                    const distSq = ddx * ddx + ddy * ddy;
+                                    if (distSq < maxDistSq && Math.random() > 0.55) {
+                                        neighborLinks.push([i, j, distSq]);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+
+                function spawnPulse() {
+                    if (neighborLinks.length === 0 || pulses.length >= 14) return;
+                    const [i, j] = neighborLinks[Math.floor(Math.random() * neighborLinks.length)];
+                    const bend = (Math.random() < 0.5 ? -1 : 1) * (12 + Math.random() * 26);
+                    pulses.push({ i, j, t: 0, speed: 0.005 + Math.random() * 0.007, bend });
+                }
+
+                function draw() {
+                    frame++;
+                    ctx.clearRect(0, 0, W, H);
+                    const t = frame * 0.001;
+
+                    FIELD_LABELS.forEach(f => {
+                        f.dx = f.x + Math.sin(t * f.sp * 2.2 + f.ph) * f.amp;
+                        f.dy = f.y + Math.cos(t * f.sp * 1.9 + f.ph * 1.7) * f.amp;
+                    });
+
+                    if (!reduceMotion && frame - lastPulseSpawn > 20) {
+                        lastPulseSpawn = frame;
+                        if (Math.random() < 0.65) spawnPulse();
+                    }
+
+                    hoveredField = mouse.active ? fieldAt(mouse.x, mouse.y) : null;
+                    const wantCursor = hoveredField ? 'pointer' : '';
+                    if (document.body.style.cursor !== wantCursor) document.body.style.cursor = wantCursor;
+
+                    particles.forEach(p => {
+                        if (!reduceMotion) {
+                            p.x = p.baseX + Math.sin(t * 0.6 + p.driftSeed) * 5;
+                            p.y = p.baseY + Math.cos(t * 0.5 + p.driftSeed * 1.3) * 5;
+                            if (mouse.active) {
+                                const dx = p.x - mouse.x, dy = p.y - mouse.y;
+                                const d = Math.sqrt(dx * dx + dy * dy);
+                                const influenceRadius = 150;
+                                if (d < influenceRadius && d > 0.01) {
+                                    const force = (1 - d / influenceRadius) * 0.85;
+                                    p.x += (dx / d) * force;
+                                    p.y += (dy / d) * force;
+                                }
+                            }
+                        }
+                    });
+
+                    // roamer
+                    roamers.forEach(r => {
+                        const rt = reduceMotion ? 0 : t;
+                        const x = r.cx + Math.sin(rt * r.fx * Math.PI + r.phase) * r.ax;
+                        const y = r.cy + Math.sin(rt * r.fy * Math.PI * 1.3 + r.phase * 1.7) * r.ay;
+                        const glow = 0.15 + 0.15 * Math.sin(rt * 1.1 + r.seed);
+                        ctx.beginPath();
+                        ctx.arc(x, y, r.r, 0, Math.PI * 2);
+                        ctx.fillStyle = 'rgba(159,214,255,' + glow + ')';
+                        ctx.fill();
+                        r._x = x;
+                        r._y = y;
+                    });
+                    for (let i = 0; i < roamers.length; i++) {
+                        const a = roamers[i], b = roamers[(i + 1) % roamers.length];
+                        if (a._x === undefined || b._x === undefined) continue;
+                        const dx = a._x - b._x, dy = a._y - b._y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist > 220) continue;
+                        const mx = (a._x + b._x) / 2 + dy * 0.08;
+                        const my = (a._y + b._y) / 2 - dx * 0.08;
+                        ctx.strokeStyle = 'rgba(159,214,255,0.07)';
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(a._x, a._y);
+                        ctx.quadraticCurveTo(mx, my, b._x, b._y);
+                        ctx.stroke();
+                    }
+
+                    // links
+                    neighborLinks.forEach(([i, j]) => {
+                        const p = particles[i], q = particles[j];
+                        if (!p || !q) return;
+                        const dx = p.x - q.x, dy = p.y - q.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        let alpha = Math.max(0, 1 - dist / 38) * 0.26;
+                        if (mouse.active) {
+                            const mdx = ((p.x + q.x) / 2) - mouse.x, mdy = ((p.y + q.y) / 2) - mouse.y;
+                            const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+                            if (mdist < 140) alpha += (1 - mdist / 140) * 0.5;
+                        }
+                        if (alpha <= 0.01) return;
+                        ctx.strokeStyle = 'rgba(159,214,255,' + alpha + ')';
+                        ctx.lineWidth = 0.6;
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(q.x, q.y);
+                        ctx.stroke();
+                    });
+
+                    // particls
+                    particles.forEach(p => {
+                        const pulse = 0.5 + 0.5 * Math.sin(t * 1.3 + p.driftSeed);
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                        ctx.fillStyle = 'rgba(159,214,255,' + (0.55 + pulse * 0.45) + ')';
+                        ctx.fill();
+                    });
+
+                    // pulse
+                    pulses = pulses.filter(pl => {
+                        pl.t += pl.speed;
+                        if (pl.t >= 1) return false;
+                        const p = particles[pl.i], q = particles[pl.j];
+                        if (!p || !q) return false;
+                        const mx = (p.x + q.x) / 2 + (q.y - p.y) * (pl.bend / 40);
+                        const my = (p.y + q.y) / 2 - (q.x - p.x) * (pl.bend / 40);
+                        const tt = pl.t;
+                        const x = (1 - tt) * (1 - tt) * p.x + 2 * (1 - tt) * tt * mx + tt * tt * q.x;
+                        const y = (1 - tt) * (1 - tt) * p.y + 2 * (1 - tt) * tt * my + tt * tt * q.y;
+                        const fade = Math.sin(Math.PI * tt);
+                        ctx.beginPath();
+                        ctx.arc(x, y, 1.8, 0, Math.PI * 2);
+                        ctx.fillStyle = 'rgba(200,67,59,' + (0.18 + fade * 0.82) + ')';
+                        ctx.fill();
+                        return true;
+                    });
+
+                    // field label
+                    ctx.font = '500 ' + (W < 760 ? 7 : 9) + 'px "IBM Plex Mono", monospace';
+                    ctx.textAlign = 'center';
+                    ctx.save();
+                    ctx.shadowColor = 'rgba(5, 5, 6, 0.9)';
+                    ctx.shadowBlur = 5;
+                    FIELD_LABELS.forEach(f => {
+                        let dist = 9999;
+                        if (mouse.active) {
+                            const dx = f.dx - mouse.x, dy = f.dy - mouse.y;
+                            dist = Math.sqrt(dx * dx + dy * dy);
+                        }
+                        const isHover = hoveredField === f;
+                        const proximity = mouse.active ? Math.max(0, 1 - dist / 200) : 0;
+                        const hoverBoost = isHover ? 0.5 : 0;
+                        const baseAlpha = 0.88;
+                        const alpha = Math.min(1, baseAlpha + proximity * 0.12 + hoverBoost);
+                        const nodeR = isHover ? 3.4 : 2.3;
+
+                        if (isHover) {
+                            ctx.beginPath();
+                            ctx.arc(f.dx, f.dy, 8, 0, Math.PI * 2);
+                            ctx.strokeStyle = 'rgba(200,67,59,0.55)';
+                            ctx.lineWidth = 1;
+                            ctx.stroke();
+                        }
+
+                        ctx.beginPath();
+                        ctx.arc(f.dx, f.dy, nodeR, 0, Math.PI * 2);
+                        ctx.fillStyle = 'rgba(200,67,59,' + Math.min(1, 0.75 + proximity * 0.25 + hoverBoost) + ')';
+                        ctx.fill();
+
+                        ctx.fillStyle = 'rgb(236, 118, 108)';
+                        ctx.globalAlpha = alpha;
+                        ctx.fillText(f.text.toUpperCase(), f.dx, f.dy - 13);
+                        ctx.globalAlpha = 1;
+                    });
+                    ctx.restore();
+
+                    if (clickPulse) {
+                        clickPulse.t += 0.04;
+                        if (clickPulse.t >= 1) { clickPulse = null; } else {
+                            const f = clickPulse.field;
+                            const rad = 5 + clickPulse.t * 32;
+                            ctx.beginPath();
+                            ctx.arc(f.dx, f.dy, rad, 0, Math.PI * 2);
+                            ctx.strokeStyle = 'rgba(200,67,59,' + ((1 - clickPulse.t) * 0.65) + ')';
+                            ctx.lineWidth = 1.2;
+                            ctx.stroke();
+                        }
+                    }
+
+                    // pause loop
+                    if (!reduceMotion && brainInView) requestAnimationFrame(draw);
+                }
+
+                function startDrawLoop() {
+                    requestAnimationFrame(draw);
+                }
+
+                function goToField(f) {
+                    if (!f) return;
+                    const el = document.getElementById(f.target);
+                    if (!el) return;
+                    clickPulse = { field: f, t: 0 };
+                    el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+                }
+
+                window.addEventListener('resize', resize);
+                window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; mouse.active = true; });
+                window.addEventListener('mouseleave', () => { mouse.active = false; });
+                window.addEventListener('touchmove', (e) => {
+                    if (e.touches[0]) { mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY; mouse.active = true; }
+                }, { passive: true });
+                window.addEventListener('touchend', () => { mouse.active = false; });
+                window.addEventListener('touchstart', (e) => {
+                    if (e.touches[0]) touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                }, { passive: true });
+
+                window.addEventListener('click', (e) => {
+                    if (e.target.closest('a, button, .nav-pill, .top-nav, .kmap-preview, .study-nav-row, .study-grid-wrap')) return;
+                    goToField(fieldAt(e.clientX, e.clientY));
+                });
+                window.addEventListener('touchend', (e) => {
+                    if (e.target.closest('a, button, .nav-pill, .top-nav, .kmap-preview, .study-nav-row, .study-grid-wrap')) return;
+                    const touch = e.changedTouches && e.changedTouches[0];
+                    if (!touch || !touchStart) return;
+                    // taps only
+                    const moved = Math.hypot(touch.clientX - touchStart.x, touch.clientY - touchStart.y);
+                    if (moved > 12) return;
+                    goToField(fieldAt(touch.clientX, touch.clientY));
+                });
+
+                // park the animation loop
+                const heroEl = document.querySelector('.hero');
+                if ('IntersectionObserver' in window && heroEl) {
+                    new IntersectionObserver((entries) => {
+                        entries.forEach(en => {
+                            if (en.isIntersecting) {
+                                if (!brainInView) {
+                                    brainInView = true;
+                                    startDrawLoop();
+                                }
+                            } else {
+                                brainInView = false;
+                            }
+                        });
+                    }, { rootMargin: '240px 0px 0px 0px', threshold: 0 }).observe(heroEl);
+                }
+
+                resize();
+                setInterval(() => {
+                    if (brainInView && !reduceMotion && !document.hidden) computeLinks();
+                }, 3500);
+                startDrawLoop();
+            })();
+        } catch (err) {
+            console.error('Brain canvas failed to initialize:', err);
+        }
+
+        (function footerClock() {
+            const el = document.getElementById('footerClock');
+            if (!el) return;
+            const pad = n => String(n).padStart(2, '0');
+            const tick = () => {
+                el.textContent = 'Tehran ' + new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Tehran', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date());
+            };
+            tick();
+            setInterval(tick, 15000);
+        })();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderStudyGrid();
+            initSkills();
+            initNotes();
+            renderCountdown(); renderStudyStats(); renderWeekly();
+            const prevBtn = document.getElementById('prevMonthBtn');
+            const nextBtn = document.getElementById('nextMonthBtn');
+            if (prevBtn) prevBtn.addEventListener('click', () => changeMonth(-1));
+            if (nextBtn) nextBtn.addEventListener('click', () => changeMonth(1));
+
+            const discordCard = document.getElementById('discordCard');
+            if (discordCard) {
+                const handleEl = discordCard.querySelector('.t-handle');
+                const feedback = () => {
+                    handleEl.textContent = 'copied!';
+                    setTimeout(() => { handleEl.textContent = 'moonkip1174'; }, 1500);
+                };
+                discordCard.addEventListener('click', () => {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText('moonkip1174').then(feedback).catch(() => {});
+                    } else {
+                        const ta = document.createElement('textarea');
+                        ta.value = 'moonkip1174';
+                        document.body.appendChild(ta);
+                        ta.select();
+                        try { document.execCommand('copy'); feedback(); } catch (err) {}
+                        document.body.removeChild(ta);
+                    }
+                });
+            }
+
+            const grindHero = document.querySelector('.grind-hero');
+            if (grindHero && 'IntersectionObserver' in window && !RM) {
+                new IntersectionObserver((entries, obs) => {
+                    entries.forEach(en => {
+                        if (en.isIntersecting && !grindAnimated && lastTotal !== null) {
+                            grindAnimated = true;
+                            animateGrind(lastTotal);
+                            obs.unobserve(en.target);
+                        }
+                    });
+                }, { threshold: 0.1, rootMargin: '0px 0px -15% 0px' }).observe(grindHero);
+            } else {
+                grindAnimated = true;
+            }
+
+            (function scheduleMidnight() {
+                const arm = () => {
+                    const n = new Date();
+                    const t = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1, 0, 0, 3);
+                    setTimeout(() => {
+                        try { renderStudyGrid(); renderStudyStats(); renderWeekly(); renderCountdown(); } catch (err) {}
+                        arm();
+                    }, t - n);
+                };
+                arm();
+            })();
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) return;
+                try { renderStudyGrid(); renderStudyStats(); renderWeekly(); renderCountdown(); } catch (err) {}
+            });
+        });
+    </script>
+
+</body>
+</html>
