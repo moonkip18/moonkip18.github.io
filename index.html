@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -52,15 +52,15 @@
         .comet::after { content: ''; position: absolute; top: 50%; right: 100%; width: 46px; height: 1px; background: linear-gradient(to left, rgba(159,214,255,0.45), transparent); transform: translateY(-50%); }
 
         .top-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 5px 16px; background: rgba(5,5,6,0.3); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border-bottom: 1px solid var(--line); opacity: 0; animation: fadeUp 0.8s ease forwards 0.15s; }
-        .top-nav-mark { font-family: 'Fraunces', serif; font-style: italic; font-size: 12px; color: var(--ink-dim); white-space: nowrap; letter-spacing: 0.02em; }
+        .top-nav-mark { font-family: 'Fraunces', serif; font-style: italic; font-size: 14px; color: var(--ink-dim); white-space: nowrap; letter-spacing: 0.02em; }
         .top-nav-links { display: flex; flex-wrap: wrap; gap: 2px; justify-content: flex-end; }
-        .nav-pill { font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 9px; border: 1px solid transparent; border-radius: 100px; color: var(--ink-faint); transition: all 0.3s ease; }
+        .nav-pill { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.09em; text-transform: uppercase; padding: 5px 11px; border: 1px solid transparent; border-radius: 100px; color: var(--ink-faint); transition: all 0.3s ease; }
         .nav-pill:hover { color: var(--ink); border-color: var(--synapse-dim); background: rgba(255,255,255,0.03); }
         .nav-pill.active { color: var(--red); border-color: var(--red-dim); background: rgba(200,67,59,0.08); }
         @media (max-width: 600px) {
             .top-nav { padding: 4px 10px; }
-            .top-nav-mark { font-size: 10px; }
-            .nav-pill { font-size: 7px; padding: 3px 6px; }
+            .top-nav-mark { font-size: 12px; }
+            .nav-pill { font-size: 9px; padding: 4px 8px; }
         }
 
         .hero { position: relative; z-index: 3; min-height: 100vh; display: flex; align-items: flex-start; padding: 110px 30px 120px; pointer-events: none; }
@@ -136,7 +136,7 @@
         .split-bar { display: block; width: 150px; height: 7px; border-radius: 3px; background: #182028; }
         .split-val { color: var(--ink-dim); text-transform: none; letter-spacing: 0.05em; }
 
-        .weekly-wrap { margin-top: 20px; border: 1px solid var(--line); background: var(--bg-elevated); padding: 18px 20px 24px; }
+        .weekly-wrap { margin-top: 20px; margin-bottom: 26px; border: 1px solid var(--line); background: var(--bg-elevated); padding: 18px 20px 24px; }
         .weekly-head { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 14px; }
         .weekly-head b { font-weight: 500; color: var(--synapse); }
         .weekly-head.hot b { color: #ec7676; }
@@ -250,10 +250,7 @@
         }
         @media (max-width: 480px) {
             :root { --cell-size: 26px; --cell-gap: 4px; }
-            .kmap-preview { padding: 14px; overflow-x: auto; }
-            .kmap-preview svg { min-width: 640px; }
-            .kmap-node-label { font-size: 11px; }
-            .kmap-node .dot { r: 6; }
+            .kmap-preview { padding: 10px; }
         }
         @media (prefers-reduced-motion: reduce) {
             .hero-mark, .hero-title, .hero-tagline, .hero-subtitle, .hero-countdown, .top-nav, .scroll-cue {
@@ -454,9 +451,9 @@
                 <h2 class="lab-heading">Contact</h2>
                 <p class="lab-desc">I check some of these more than others, pick whatever’s more comfy for you.</p>
                 <div class="talk-grid">
-                    <div class="talk-card soon" title="Repo goes public later">
+                    <div class="talk-card soon" title="Not using GitHub right now">
                         <span class="t-platform">GitHub</span>
-                        <span class="t-handle">private for now</span>
+                        <span class="t-handle">i dont use it for now</span>
                     </div>
                     <div class="talk-card" id="discordCard" title="Click to copy Discord handle">
                         <span class="t-platform">Discord</span>
@@ -1270,6 +1267,7 @@
                 let roamers = [];
                 let brainInView = true;
                 let touchStart = null;
+                let touchScrolling = false;
 
                 // dots (one per tab)
                 const FIELD_LABELS = [
@@ -1351,7 +1349,7 @@
                     particles = [];
                     const cx = W < 760 ? W * 0.50 : W * 0.72;
                     const cy = W < 760 ? H * 0.66 : H * 0.47;
-                    const scale = Math.min(W, H) * (W < 760 ? 0.55 : 0.64);
+                    const scale = Math.min(W, H) * (W < 760 ? 0.64 : 0.64);
 
                     const targetCount = W < 760 ? 440 : 950;
                     let attempts = 0;
@@ -1445,6 +1443,7 @@
                 }
 
                 function draw() {
+                    if (!brainInView || touchScrolling) { rafActive = false; return; }
                     frame++;
                     ctx.clearRect(0, 0, W, H);
                     const t = frame * 0.001;
@@ -1612,9 +1611,13 @@
 
                     // pause loop
                     if (!reduceMotion && brainInView) requestAnimationFrame(draw);
+                    else { rafActive = false; }
                 }
 
+                let rafActive = false;
                 function startDrawLoop() {
+                    if (rafActive) return;
+                    rafActive = true;
                     requestAnimationFrame(draw);
                 }
 
@@ -1629,19 +1632,22 @@
                 window.addEventListener('resize', resize);
                 window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; mouse.active = true; });
                 window.addEventListener('mouseleave', () => { mouse.active = false; });
-                window.addEventListener('touchmove', (e) => {
-                    if (e.touches[0]) { mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY; mouse.active = true; }
-                }, { passive: true });
+                window.addEventListener('touchmove', () => { touchScrolling = true; }, { passive: true });
                 window.addEventListener('touchend', () => { mouse.active = false; });
                 window.addEventListener('touchstart', (e) => {
                     if (e.touches[0]) touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
                 }, { passive: true });
+                window.addEventListener('touchend', () => {
+                    setTimeout(() => { touchScrolling = false; startDrawLoop(); }, 160);
+                });
 
                 window.addEventListener('click', (e) => {
+                    if (W < 760) return;
                     if (e.target.closest('a, button, .nav-pill, .top-nav, .kmap-preview, .study-nav-row, .study-grid-wrap')) return;
                     goToField(fieldAt(e.clientX, e.clientY));
                 });
                 window.addEventListener('touchend', (e) => {
+                    if (W < 760) return;
                     if (e.target.closest('a, button, .nav-pill, .top-nav, .kmap-preview, .study-nav-row, .study-grid-wrap')) return;
                     const touch = e.changedTouches && e.changedTouches[0];
                     if (!touch || !touchStart) return;
