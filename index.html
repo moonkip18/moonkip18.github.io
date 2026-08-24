@@ -46,10 +46,10 @@
         .grain { position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0.03; mix-blend-mode: overlay; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 
         #bg-particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-        .bg-neuron { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(159,214,255,0.2) 0%, rgba(159,214,255,0) 80%); will-change: transform, opacity; pointer-events: none; }
-        .bg-neuron-core { position: absolute; border-radius: 50%; background: rgba(159,214,255,0.5); top: 50%; left: 50%; transform: translate(-50%, -50%); will-change: transform; }
-        .comet { position: absolute; width: 2px; height: 2px; background: rgba(159,214,255,0.75); border-radius: 50%; box-shadow: 0 0 6px 2px rgba(159,214,255,0.25); will-change: transform, opacity; pointer-events: none; }
-        .comet::after { content: ''; position: absolute; top: 50%; right: 100%; width: 46px; height: 1px; background: linear-gradient(to left, rgba(159,214,255,0.45), transparent); transform: translateY(-50%); }
+        .bg-neuron { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(222,228,235,0.2) 0%, rgba(222,228,235,0) 80%); will-change: transform, opacity; pointer-events: none; }
+        .bg-neuron-core { position: absolute; border-radius: 50%; background: rgba(222,228,235,0.5); top: 50%; left: 50%; transform: translate(-50%, -50%); will-change: transform; }
+        .comet { position: absolute; width: 2px; height: 2px; background: rgba(222,228,235,0.75); border-radius: 50%; box-shadow: 0 0 6px 2px rgba(222,228,235,0.25); will-change: transform, opacity; pointer-events: none; }
+        .comet::after { content: ''; position: absolute; top: 50%; right: 100%; width: 46px; height: 1px; background: linear-gradient(to left, rgba(222,228,235,0.45), transparent); transform: translateY(-50%); }
 
         .top-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 5px 16px; background: rgba(5,5,6,0.3); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border-bottom: 1px solid var(--line); opacity: 0; animation: fadeUp 0.8s ease forwards 0.15s; }
         .top-nav-mark { font-family: 'Fraunces', serif; font-style: italic; font-size: 14px; color: var(--ink-dim); white-space: nowrap; letter-spacing: 0.02em; }
@@ -107,7 +107,7 @@
         .kmap-preview svg { width: 100%; max-width: 680px; height: auto; margin: 0 auto; display: block; touch-action: none; user-select: none; -webkit-user-select: none; }
         .kmap-node-label { font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; letter-spacing: 0.06em; fill: var(--ink-dim); text-transform: uppercase; }
         .kmap-edge { transition: stroke 0.35s ease, stroke-opacity 0.35s ease; }
-        .kmap-edge.lit { stroke: rgba(159,214,255,0.85); stroke-opacity: 1; }
+        .kmap-edge.lit { stroke: rgba(222,228,235,0.85); stroke-opacity: 1; }
         .kmap-node { cursor: grab; }
         .kmap-node .dot { transition: r 0.15s ease, stroke 0.25s ease, stroke-width 0.25s ease; }
         .kmap-node:hover .dot, .kmap-node.active .dot { r: 7; }
@@ -132,7 +132,6 @@
         .stat-label { display: block; margin-top: 3px; font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); }
 
         .split-wrap { display: none; align-items: center; gap: 10px; margin-top: 12px; font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); }
-        .split-bar { display: flex; width: 150px; height: 7px; border-radius: 3px; overflow: hidden; background: #101318; }
         .split-bar { display: block; width: 150px; height: 7px; border-radius: 3px; background: #182028; }
         .split-val { color: var(--ink-dim); text-transform: none; letter-spacing: 0.05em; }
 
@@ -142,7 +141,7 @@
         .weekly-head.hot b { color: #ec7676; }
         .weekly-head .w-pace { color: var(--ink-faint); }
         .weekly-track { position: relative; height: 14px; border-radius: 999px; background: #0d0f13; border: 1px solid var(--line); }
-        .weekly-fill { position: relative; overflow: hidden; height: 100%; width: 0%; border-radius: 999px; background: rgba(159,214,255,0.45); transition: width 0.8s ease; }
+        .weekly-fill { position: relative; overflow: hidden; height: 100%; width: 0%; border-radius: 999px; background: rgba(222,228,235,0.45); transition: width 0.8s ease; }
         .weekly-fill.hot { background: rgba(200,67,59,0.55); }
         .weekly-tick { position: absolute; top: -5px; bottom: -5px; width: 2px; transform: translateX(-1px); background: var(--red); }
         .weekly-tick::after { content: ''; position: absolute; top: -4px; left: -2px; width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
@@ -162,11 +161,11 @@
         .study-grid-wrap { overflow-x: auto; padding-bottom: 6px; }
         .study-grid { display: grid; grid-template-columns: repeat(7, var(--cell-size)); gap: var(--cell-gap); width: fit-content; margin: 0 auto; }
         .study-cell { width: var(--cell-size); height: var(--cell-size); border-radius: 4px; border: 1px solid var(--line); background: transparent; cursor: default; transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease; position: relative; display: flex; align-items: center; justify-content: center; font-size: 8px; color: var(--ink-faint); font-family: 'IBM Plex Mono', monospace; }
-        .study-cell:hover { transform: scale(1.2); z-index: 5; border-color: rgba(159,214,255,0.5); box-shadow: 0 0 20px rgba(159,214,255,0.08); }
+        .study-cell:hover { transform: scale(1.2); z-index: 5; border-color: rgba(222,228,235,0.5); box-shadow: 0 0 20px rgba(222,228,235,0.08); }
         .study-cell .day-num { position: absolute; bottom: 2px; right: 4px; font-size: 7px; opacity: 0.3; pointer-events: none; }
-        .study-cell[data-lvl="2"] { background: rgba(159,214,255,0.20); border-color: transparent; }
-        .study-cell[data-lvl="3"] { background: rgba(159,214,255,0.36); border-color: transparent; }
-        .study-cell[data-lvl="4"] { background: rgba(159,214,255,0.62); border-color: transparent; }
+        .study-cell[data-lvl="2"] { background: rgba(222,228,235,0.20); border-color: transparent; }
+        .study-cell[data-lvl="3"] { background: rgba(222,228,235,0.36); border-color: transparent; }
+        .study-cell[data-lvl="4"] { background: rgba(222,228,235,0.62); border-color: transparent; }
         .study-cell[data-lvl="0"]:hover { border-color: rgba(255,255,255,0.12); }
         .study-cell.today { border-color: var(--red) !important; }
         .study-cell .tooltip { display: none; position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%); background: var(--bg-elevated); border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; white-space: nowrap; font-family: 'Inter', sans-serif; font-size: 12px; color: var(--ink); box-shadow: 0 8px 30px rgba(0,0,0,0.7); pointer-events: none; z-index: 10; font-weight: 400; }
@@ -178,8 +177,8 @@
         .study-legend .lg-item { display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .study-legend .lg-item span { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); }
         .study-legend i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; border: 1px solid var(--line); }
-        .study-legend i.lvl2 { background: rgba(159,214,255,0.32); border-color: transparent; }
-        .study-legend i.lvl3 { background: rgba(159,214,255,0.55); border-color: transparent; }
+        .study-legend i.lvl2 { background: rgba(222,228,235,0.32); border-color: transparent; }
+        .study-legend i.lvl3 { background: rgba(222,228,235,0.55); border-color: transparent; }
         .study-legend i.lvl4 { background: #c9ced6; border-color: transparent; }
 
         .skill-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 28px; }
@@ -226,6 +225,8 @@
         footer .fcontact { margin-top: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-dim); border: 1px solid var(--line); border-radius: 100px; padding: 8px 18px; transition: color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; }
         footer .fcontact:hover { color: var(--red); border-color: var(--red-dim); }
         footer .ftime { font-family: 'IBM Plex Mono', monospace; font-size: 8.5px; letter-spacing: 0.14em; color: var(--ink-faint); text-transform: uppercase; opacity: 0.7; }
+        footer .ftop { margin-top: 2px; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-dim); background: transparent; border: 1px solid var(--line); border-radius: 100px; padding: 9px 20px; cursor: pointer; transition: color 0.3s ease, border-color 0.3s ease; }
+        footer .ftop:hover { color: var(--red); border-color: var(--red-dim); }
 
         @media (max-width: 900px) {
             .hero { padding: 92px 20px 48px; }
@@ -305,7 +306,7 @@
             <div class="lab-inner">
                 <div class="lab-eyebrow">Log · 01 - About Me</div>
                 <h2 class="lab-heading">Moonkip, in brief</h2>
-                <p class="lab-desc">18, Studying for CEE and doing AI, Math, Neuroscience on the side. Obsessed with Intelligence. I spent 2 years looking for hacks just to realize the only hack is not stop.<p>
+                <p class="lab-desc">18, Studying for CEE and doing AI, Math, Neuroscience on the side. Obsessed with Intelligence. I spent 2 years looking for hacks just to realize the only hack is not stop.</p>
                 <div class="lab-grid">
                     <div class="lab-card">
                         <div><div class="lab-card-id">FCT · 001</div><div class="lab-card-note">Studying Mathematics. Goal: Computer engineering.</div></div>
@@ -326,7 +327,7 @@
         <!-- Progress -->
         <section class="lab-section" id="progress">
             <div class="lab-inner">
-                <div class="lab-eyebrow">Log . 02 - Progress <span class="brain-tag">Basal Ganglia</span></div>
+                <div class="lab-eyebrow">Log Â· 02 - Progress <span class="brain-tag">Basal Ganglia</span></div>
                 <h2 class="lab-heading">Study log</h2>
                 <p class="lab-desc">The hours, logged daily</p>
                 <div class="grind-hero">
@@ -428,7 +429,7 @@
             <div class="lab-inner">
                 <div class="lab-eyebrow">Log · 06 - Knowledge Map <span class="brain-tag">Corpus Callosum</span></div>
                 <h2 class="lab-heading">How it all connects</h2>
-                <p class="lab-desc">rough map of how AI, math, neuroscience, and computer engineering connect, with computation underneath all of it.</p>
+                <p class="lab-desc">Rough map of how AI, math, neuroscience, and computer engineering connect, with computation underneath all of it.</p>
                 <div class="kmap-preview">
                     <svg id="kmapSvg" viewBox="0 0 640 400" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g id="kmapEdges"></g>
@@ -480,6 +481,7 @@
     <footer>
         <div class="fmark">Moonkip - Study Log</div>
         <div class="fnote">Updated as the days pass</div>
+        <button class="ftop" id="backToBrain" type="button">back to the top</button>
         <div class="ftime" id="footerClock"></div>
     </footer>
 
@@ -898,7 +900,7 @@
                 if (both > 0) {
                     sw.style.display = 'flex';
                     const mp = mSum / both * 100;
-                    const mCol = 'rgba(159,214,255,0.95)';
+                    const mCol = 'rgba(222,228,235,0.95)';
                     const cCol = 'rgba(244,247,250,0.95)';
                     const a = Math.max(0, mp - 14);
                     const b = Math.min(100, mp + 14);
@@ -1012,7 +1014,7 @@
                 const edgeEls = edges.map(([a, b]) => {
                     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                     line.setAttribute('class', 'kmap-edge');
-                    line.setAttribute('stroke', 'rgba(159,214,255,0.28)');
+                    line.setAttribute('stroke', 'rgba(222,228,235,0.28)');
                     line.setAttribute('stroke-width', '1');
                     line.setAttribute('stroke-dasharray', (a === 'cmp' || b === 'cmp') ? 'none' : '2 4');
                     edgesG.appendChild(line);
@@ -1487,7 +1489,7 @@
                         const glow = 0.15 + 0.15 * Math.sin(rt * 1.1 + r.seed);
                         ctx.beginPath();
                         ctx.arc(x, y, r.r, 0, Math.PI * 2);
-                        ctx.fillStyle = 'rgba(159,214,255,' + glow + ')';
+                        ctx.fillStyle = 'rgba(222,228,235,' + glow + ')';
                         ctx.fill();
                         r._x = x;
                         r._y = y;
@@ -1500,7 +1502,7 @@
                         if (dist > 220) continue;
                         const mx = (a._x + b._x) / 2 + dy * 0.08;
                         const my = (a._y + b._y) / 2 - dx * 0.08;
-                        ctx.strokeStyle = 'rgba(159,214,255,0.07)';
+                        ctx.strokeStyle = 'rgba(222,228,235,0.07)';
                         ctx.lineWidth = 0.5;
                         ctx.beginPath();
                         ctx.moveTo(a._x, a._y);
@@ -1521,7 +1523,7 @@
                             if (mdist < 140) alpha += (1 - mdist / 140) * 0.5;
                         }
                         if (alpha <= 0.01) return;
-                        ctx.strokeStyle = 'rgba(159,214,255,' + alpha + ')';
+                        ctx.strokeStyle = 'rgba(222,228,235,' + alpha + ')';
                         ctx.lineWidth = 0.6;
                         ctx.beginPath();
                         ctx.moveTo(p.x, p.y);
@@ -1534,7 +1536,7 @@
                         const pulse = 0.5 + 0.5 * Math.sin(t * 1.3 + p.driftSeed);
                         ctx.beginPath();
                         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                        ctx.fillStyle = 'rgba(159,214,255,' + (0.55 + pulse * 0.45) + ')';
+                        ctx.fillStyle = 'rgba(222,228,235,' + (0.55 + pulse * 0.45) + ')';
                         ctx.fill();
                     });
 
@@ -1710,6 +1712,12 @@
             initSkills();
             initNotes();
             renderCountdown(); renderStudyStats(); renderWeekly();
+            // back to top
+            const backBtn = document.getElementById('backToBrain');
+            if (backBtn) backBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: RM ? 'auto' : 'smooth' });
+            });
+
             const prevBtn = document.getElementById('prevMonthBtn');
             const nextBtn = document.getElementById('nextMonthBtn');
             if (prevBtn) prevBtn.addEventListener('click', () => changeMonth(-1));
