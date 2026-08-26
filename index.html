@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Moonkip - Study Log</title>
+    <title>Moonkip Study Logs</title>
     <meta name="description" content="Moonkip · Daily study log. Hours, streaks, and notes." />
     <meta name="theme-color" content="#050506" />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23050506'/%3E%3Ccircle cx='29' cy='27' r='11' fill='%23dfe3e8'/%3E%3Ccircle cx='45' cy='45' r='6' fill='%23c8433c'/%3E%3Cpath d='M33 33 L41 41' stroke='%23dfe3e8' stroke-opacity='.55' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E" />
@@ -373,7 +373,7 @@
                     <div class="split-wrap" id="splitWrap">
                         <span>math</span>
                         <span class="split-bar" id="splitBar"></span>
-                        <span>code</span>
+                        <span>CE</span>
                         <span class="split-val" id="splitVal"></span>
                     </div>
                 </div>
@@ -489,9 +489,9 @@
         // daily log
         const STUDY_ENTRIES = [
             // line below
-            // { date: '2026-08-23', math: 0, coding: 0 },
-            { date: '2026-08-24', math: 8, coding: 4 },
-            { date: '2026-08-25', math: 9, coding: 3 }
+            // { date: '2026-08-23', math: 0, ce: 0 },
+            { date: '2026-08-24', math: 8, ce: 4 },
+            { date: '2026-08-25', math: 9, ce: 3 }
         ];
 
         // baseline (hours i've put in studying before making this website)
@@ -556,7 +556,7 @@
                 if (d.getFullYear() === year && d.getMonth() === month) {
                     entryMap[d.getDate()] = e;
                     mathTotal += e.math || 0;
-                    codingTotal += e.coding || 0;
+                    codingTotal += e.ce || 0;
                     monthEntries++;
                 }
             });
@@ -567,7 +567,7 @@
             } else {
                 totals.innerHTML =
                     '<span class="tot-num">' + fmt(totalHrs) + 'h</span> total <span class="tot-split">· ' +
-                    fmt(mathTotal) + 'h math · ' + fmt(codingTotal) + 'h code</span>';
+                    fmt(mathTotal) + 'h math · ' + fmt(codingTotal) + 'h CE</span>';
             }
 
             grid.innerHTML = '';
@@ -591,7 +591,7 @@
                 const cell = document.createElement('div');
                 cell.className = 'study-cell';
                 const entry = entryMap[d];
-                const total = entry ? (entry.math || 0) + (entry.coding || 0) : 0;
+                const total = entry ? (entry.math || 0) + (entry.ce || 0) : 0;
                 let lvl = 0;
                 if (total >= 12) lvl = 4;
                 else if (total >= 8) lvl = 3;
@@ -609,7 +609,7 @@
                     const tip = document.createElement('div');
                     tip.className = 'tooltip';
                     tip.innerHTML =
-                        '<span class="math-hrs">Math: ' + (entry.math || 0) + 'h</span> · <span class="code-hrs">Coding: ' + (entry.coding || 0) + 'h</span>';
+                        '<span class="math-hrs">Math: ' + (entry.math || 0) + 'h</span> · <span class="code-hrs">CE: ' + (entry.ce || 0) + 'h</span>';
                     cell.appendChild(tip);
                     cell.title = '';
                     // tap toggles
@@ -839,11 +839,11 @@
             STUDY_ENTRIES.forEach(e => {
                 const d = parseLocalDate(e.date);
                 if (!d) return;
-                const h = (e.math || 0) + (e.coding || 0);
+                const h = (e.math || 0) + (e.ce || 0);
                 days.push({ d, h: h });
                 total += h;
                 mSum += e.math || 0;
-                cSum += e.coding || 0;
+                cSum += e.ce || 0;
             });
             lastTotal = total;
 
@@ -934,7 +934,7 @@
             STUDY_ENTRIES.forEach(e => {
                 const d = parseLocalDate(e.date);
                 if (!d) return;
-                if (d >= monday && d < nextMonday) hrs += (e.math || 0) + (e.coding || 0);
+                if (d >= monday && d < nextMonday) hrs += (e.math || 0) + (e.ce || 0);
             });
 
             const fmt = n => Number.isInteger(n) ? String(n) : n.toFixed(1);
